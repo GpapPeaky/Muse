@@ -150,7 +150,7 @@ fn calibrate_string_color(string: &str) -> Color {
 }
 
 /// Record special key presses
-pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole) -> bool {
+pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer) -> bool {
     if is_key_pressed(KeyCode::Backspace) {
         audio.play_delete();
 
@@ -234,6 +234,18 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
 
         file_text_special_navigation(&mut cursor.xy, text, audio);
 
+        if is_key_pressed(KeyCode::Minus) {
+            if gts.font_size > 12 {
+                gts.font_size -= 2;
+            }
+        }
+
+        if is_key_pressed(KeyCode::Equal) {
+            if gts.font_size < 45 {
+                gts.font_size += 2;
+            }
+        }
+
         return true;
     } else {
         file_text_navigation(&mut cursor.xy, text, audio);
@@ -243,14 +255,14 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
 }
 
 /// Standard key recording function
-pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole) {
+pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer) {
     // let c = get_char_pressed().unwrap(); // Unwrap removes the Result/Option wrapper.
 
     if text.is_empty() { // Allocate memory for a new string
         text.push(String::new());
     }
 
-    if record_special_keys(cursor, text, audio, console) {
+    if record_special_keys(cursor, text, audio, console, gts) {
         return; // Handle the special key and terminate the call, as to 
         // not record any special escape character
     }
@@ -378,7 +390,8 @@ pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<St
                 cursor.xy.0 += 1;
             }
         }
- 
+        
+        
     }
 }
 
@@ -387,13 +400,14 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     let start_x = FILE_TEXT_X_MARGIN;
     let start_y = FILE_TEXT_Y_MARGIN;
     let line_spacing = gts.font_size as f32;
+    let line_start_relative_to_font_size_fix = gts.font_size as f32 * 1.5;
     
     // Draw cursor
     if cursor_y < text.len() {
         let line = &text[cursor_y];
         let cursor_text = &line[..cursor_x.min(line.len())];
         let text_before_cursor = measure_text(cursor_text, Some(&gts.font), gts.font_size, 1.0);
-        let cursor_x_pos = start_x + text_before_cursor.width;
+        let cursor_x_pos = start_x + line_start_relative_to_font_size_fix + text_before_cursor.width;
         let cursor_y_pos = start_y + cursor_y as f32 * line_spacing;
 
         // Cursor width, either of the current char size, or static 2.0px
@@ -421,7 +435,7 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     let mut y;    
 
     for (line_index, line) in text.iter().enumerate() {
-        x = start_x;
+        x = start_x + line_start_relative_to_font_size_fix;
         y = start_y + line_index as f32 * line_spacing;
 
         for cap in TOKEN_PATTERN.find_iter(line) {

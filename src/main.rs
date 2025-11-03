@@ -30,7 +30,7 @@ async fn main() {
     loop {
         clear_background(BACKGROUND_COLOR);
 
-        record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console);
+        record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts);
 
         draw(&mut file_text, file_cursor.xy.0, file_cursor.xy.1, &mut gts, &console);
 
