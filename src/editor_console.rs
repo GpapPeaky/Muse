@@ -16,7 +16,7 @@ pub struct EditorConsole {
 }
 
 const CONSOLE_WIDTH: f32 = 255.0;
-pub const CONSOLE_MARGINS: f32 = 25.0;
+pub const CONSOLE_MARGINS: f32 = 15.0;
 
 impl EditorConsole {
     /// Console constructor
@@ -45,10 +45,18 @@ impl EditorConsole {
             BACKGROUND_COLOR
         );
 
+        draw_line(screen_width() - CONSOLE_WIDTH,
+            CONSOLE_MARGINS + 25.0,
+            screen_width(),
+            CONSOLE_MARGINS + 25.0,
+            1.0,
+            COMPOSITE_TYPE_COLOR
+        );
+
         draw_text(&self.directive,
-            screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS,
-            CONSOLE_MARGINS,
-            15.0,
+            screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS - 5.0,
+            CONSOLE_MARGINS + 15.0,
+            30.0,
             COMPOSITE_TYPE_COLOR
         );
     }
@@ -78,9 +86,11 @@ impl EditorConsole {
 
         if is_key_pressed(KeyCode::Enter) {
             // execute whatever is inside the directive string
+            // check the directives' source
         }
     }
 
+    /// Record  heyboard input
     pub fn record_keyboard_to_console_text(&mut self, audio: &EditorAudio) {
         self.record_special_console_keys(audio);
 

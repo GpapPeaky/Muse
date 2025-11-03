@@ -32,13 +32,13 @@ async fn main() {
 
         if !console.mode {
             record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts);
+            draw_text("INSERT MODE", 15.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR);
         } else {
             console.record_keyboard_to_console_text(&audio);
+            draw_text("CONSOLE MODE", 15.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR);
         }
 
         draw(&mut file_text, file_cursor.xy.0, file_cursor.xy.1, &mut gts, &console);
-
-        draw_fps();
 
         next_frame().await;
     }

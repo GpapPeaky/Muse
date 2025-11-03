@@ -46,11 +46,14 @@ static TOKEN_PATTERN: Lazy<Regex> = Lazy::new(|| {
     ).unwrap()
 });
 
+pub const MODE_FONT_SIZE: f32 = 30.0;
+pub const MODE_Y_MARGIN: f32 = 10.0;
+
 const FILE_LINE_NUMBER_X_MARGIN: f32 = 5.0;
-const FILE_LINE_NUMBER_Y_MARGIN: f32 = 6.0;
+const FILE_LINE_NUMBER_Y_MARGIN: f32 = 26.0;
 
 const FILE_TEXT_X_MARGIN: f32 = 50.0;
-const FILE_TEXT_Y_MARGIN: f32 = 60.0;
+const FILE_TEXT_Y_MARGIN: f32 = 80.0;
 const TAB_SIZE: usize = 6;
 const TAB_PATTERN: &str = "      ";
 
@@ -401,6 +404,8 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     let start_y = FILE_TEXT_Y_MARGIN;
     let line_spacing = gts.font_size as f32;
     let line_start_relative_to_font_size_fix = gts.font_size as f32 * 1.5;
+
+    draw_line(0.0, MODE_Y_MARGIN + MODE_FONT_SIZE, screen_width(), MODE_Y_MARGIN + MODE_FONT_SIZE, 1.0, COMPOSITE_TYPE_COLOR);
     
     if !console.mode {
         // Draw text cursor
@@ -432,8 +437,7 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
             );
         }
     } else {
-        // Draw console cursor
-        console.draw();
+
     }
 
     let mut x;
@@ -498,5 +502,9 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
         gts.draw(&i.to_string(), FILE_LINE_NUMBER_X_MARGIN,
             1.1 * FILE_TEXT_X_MARGIN + FILE_LINE_NUMBER_Y_MARGIN + gts.font_size as f32 * i as f32
         );
+    }
+
+    if console.mode {
+        console.draw();
     }
 }
