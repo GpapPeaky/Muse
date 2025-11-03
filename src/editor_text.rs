@@ -123,7 +123,7 @@ const C_DATA_TYPES: [&str ; 9] = [
 /// Convert a provided character index to the actual byte
 /// the character is at. Allows for UTF-8 characters
 /// and not only ASCII
-fn char_to_byte(line: &str, char_idx: usize) -> usize {
+pub fn char_to_byte(line: &str, char_idx: usize) -> usize {
     // We use UTF-8 so we need to count bytes NOT characters like C.
     line.char_indices().nth(char_idx).map(|(b, _)| b).unwrap_or(line.len())
 }
@@ -229,22 +229,22 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
     if is_key_down(KeyCode::LeftControl) {
         // Console switch
         if is_key_pressed(KeyCode::GraveAccent) {
-            console.mode = !console.mode; 
+            console.mode = true; 
         }
-
-        file_text_special_navigation(&mut cursor.xy, text, audio);
 
         if is_key_pressed(KeyCode::Minus) {
             if gts.font_size > 12 {
                 gts.font_size -= 2;
             }
         }
-
+        
         if is_key_pressed(KeyCode::Equal) {
             if gts.font_size < 45 {
                 gts.font_size += 2;
             }
         }
+
+        file_text_special_navigation(&mut cursor.xy, text, audio);
 
         return true;
     } else {
@@ -402,33 +402,38 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     let line_spacing = gts.font_size as f32;
     let line_start_relative_to_font_size_fix = gts.font_size as f32 * 1.5;
     
-    // Draw cursor
-    if cursor_y < text.len() {
-        let line = &text[cursor_y];
-        let cursor_text = &line[..cursor_x.min(line.len())];
-        let text_before_cursor = measure_text(cursor_text, Some(&gts.font), gts.font_size, 1.0);
-        let cursor_x_pos = start_x + line_start_relative_to_font_size_fix + text_before_cursor.width;
-        let cursor_y_pos = start_y + cursor_y as f32 * line_spacing;
+    if !console.mode {
+        // Draw text cursor
+        if cursor_y < text.len() {
+            let line = &text[cursor_y];
+            let cursor_text = &line[..cursor_x.min(line.len())];
+            let text_before_cursor = measure_text(cursor_text, Some(&gts.font), gts.font_size, 1.0);
+            let cursor_x_pos = start_x + line_start_relative_to_font_size_fix + text_before_cursor.width;
+            let cursor_y_pos = start_y + cursor_y as f32 * line_spacing;
 
-        // Cursor width, either of the current char size, or static 2.0px
-        let cursor_width = if CURSOR_LINE_TO_WIDTH && cursor_x < line.len() {
-            measure_text(
-                &line.chars().nth(cursor_x).unwrap().to_string(),
-                Some(&gts.font),
-                gts.font_size,
-                1.0,
-            ).width
-        } else {
-            2.0
-        };
+            // Cursor width, either of the current char size, or static 2.0px
+            let cursor_width = if CURSOR_LINE_TO_WIDTH && cursor_x < line.len() {
+                measure_text(
+                    &line.chars().nth(cursor_x).unwrap().to_string(),
+                    Some(&gts.font),
+                    gts.font_size,
+                    1.0,
+                ).width
+            } else {
+                2.0
+            };
 
-        draw_rectangle(
-            cursor_x_pos,
-            cursor_y_pos - gts.font_size as f32 * 0.8,
-            cursor_width,
-            gts.font_size as f32,
-            CURSOR_COLOR,
-        );
+            draw_rectangle(
+                cursor_x_pos,
+                cursor_y_pos - gts.font_size as f32 * 0.8,
+                cursor_width,
+                gts.font_size as f32,
+                CURSOR_COLOR,
+            );
+        }
+    } else {
+        // Draw console cursor
+        console.draw();
     }
 
     let mut x;
@@ -493,9 +498,5 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
         gts.draw(&i.to_string(), FILE_LINE_NUMBER_X_MARGIN,
             1.1 * FILE_TEXT_X_MARGIN + FILE_LINE_NUMBER_Y_MARGIN + gts.font_size as f32 * i as f32
         );
-    }
-    
-    if console.mode {
-        console.draw();
     }
 }

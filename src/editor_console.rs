@@ -3,20 +3,28 @@
 
 use macroquad::prelude::*;
 
-use crate::editor_text::*;
+#[path = "editor_console_cursor.rs"]
+mod editor_console_cursor;
+use editor_console_cursor::*;
+
+use crate::{editor_audio::EditorAudio, editor_text::*};
 
 pub struct EditorConsole {
     pub mode: bool,
-    pub directive: Option<String>,
-    pub directive_param: Option<String>
+    pub directive: String,
+    pub cursor: EditorConsoleCursor
 }
 
 const CONSOLE_WIDTH: f32 = 255.0;
+pub const CONSOLE_MARGINS: f32 = 25.0;
 
 impl EditorConsole {
     /// Console constructor
     pub fn new() -> EditorConsole {
-        EditorConsole { mode: false, directive: None, directive_param: None }
+        EditorConsole { mode: false,
+            directive: String::new(),
+            cursor: EditorConsoleCursor::new()
+        }
     }
 
     /// Console will be drawn to the right of the screen
@@ -36,5 +44,64 @@ impl EditorConsole {
             screen_height(),
             BACKGROUND_COLOR
         );
+
+        draw_text(&self.directive,
+            screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS,
+            CONSOLE_MARGINS,
+            15.0,
+            COMPOSITE_TYPE_COLOR
+        );
+    }
+
+    /// Special input, backspace and enter
+    fn record_special_console_keys(&mut self, audio: &EditorAudio) {
+        if is_key_pressed(KeyCode::Backspace) {
+            if self.cursor.x > 0 {
+                let byte_idx = char_to_byte(&self.directive, self.cursor.x - 1);
+                self.directive.remove(byte_idx);
+                self.cursor.x -= 1;
+                audio.play_delete();
+            }
+
+            return;
+        }
+
+        if is_key_down(KeyCode::LeftControl) {
+            if is_key_pressed(KeyCode::GraveAccent) {
+                self.mode = false;
+            }
+
+            console_text_special_navigation(&mut self.cursor.x, &mut self.directive, audio);
+        } else {
+            console_text_navigation(&mut self.cursor.x, &mut self.directive, audio);
+        }
+
+        if is_key_pressed(KeyCode::Enter) {
+            // execute whatever is inside the directive string
+        }
+    }
+
+    pub fn record_keyboard_to_console_text(&mut self, audio: &EditorAudio) {
+        self.record_special_console_keys(audio);
+
+        if let Some(c) = get_char_pressed() {
+            match c {
+                '\u{8}' | '\r' | '\n' | '\t' => {
+                    return;
+                }
+
+                _ => {
+                    if c != ' ' { 
+                        audio.play_insert();
+                    } else {
+                        audio.play_space();
+                    }
+
+                    let byte_idx = char_to_byte(&self.directive, self.cursor.x);
+                    self.directive.insert(byte_idx, c);
+                    self.cursor.x += 1;
+                }
+            }
+        }
     }
 }
