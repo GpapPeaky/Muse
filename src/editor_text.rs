@@ -57,21 +57,21 @@ const FILE_TEXT_Y_MARGIN: f32 = 80.0;
 const TAB_SIZE: usize = 6;
 const TAB_PATTERN: &str = "      ";
 
-pub const BACKGROUND_COLOR: Color     = Color::from_rgba(8, 0, 15, 255);        // Theater dark — emotional void
-const IDENTIFIER_COLOR: Color         = Color::from_rgba(190, 140, 230, 255);   // Pale violet — fateful names
-const PUNCTUATION_COLOR: Color        = Color::from_rgba(255, 255, 255, 255);   // White — clarity in despair
-const CONTROL_FLOW_COLOR: Color       = Color::from_rgba(130, 100, 255, 255);   // Tragic blue — falling motion
-const STORAGE_CLASS_COLOR: Color      = Color::from_rgba(255, 70, 110, 255);    // Crimson sorrow — bleeding intent
-const TYPE_QUALIFIER_COLOR: Color     = Color::from_rgba(255, 210, 90, 255);    // Pale gold — faded grandeur
-pub const COMPOSITE_TYPE_COLOR: Color = Color::from_rgba(140, 0, 180, 255);     // Dark purple — structure of fate
-const MISC_COLOR: Color               = Color::from_rgba(100, 130, 200, 255);   // Twilight blue — haunting echo
-const DATA_TYPE_COLOR: Color          = Color::from_rgba(60, 190, 150, 255);    // Teal — fragile balance
-const NUMBER_LITERAL_COLOR: Color     = Color::from_rgba(255, 235, 150, 255);   // Candle gold — memory counts
-const STRING_LITERAL_COLOR: Color     = Color::from_rgba(255, 120, 170, 255);   // Mourning rose — spoken sorrow
-const COMMENT_COLOR: Color            = Color::from_rgba(100, 90, 110, 255);    // Smoke gray — whispered lament
-const CURSOR_COLOR: Color             = Color::from_rgba(255, 0, 130, 255);     // Magenta glow — pulse of pain
-const MACRO_COLOR: Color              = Color::from_rgba(255, 110, 0, 255);     // Ember orange — spark of catharsis
-const MAIN_COLOR: Color               = Color::from_rgba(180, 60, 255, 255);    // Regal violet — tragic beauty
+pub const BACKGROUND_COLOR: Color     = Color::from_rgba(25, 0, 20, 255);       // Wine velvet — intimate depth
+const IDENTIFIER_COLOR: Color         = Color::from_rgba(247, 180, 10, 255);
+const PUNCTUATION_COLOR: Color        = Color::from_rgba(225, 185, 135, 255);
+const CONTROL_FLOW_COLOR: Color       = Color::from_rgba(255, 80, 180, 255);    // Fuchsia pulse — flowing emotion
+pub const STORAGE_CLASS_COLOR: Color  = Color::from_rgba(170, 0, 80, 255);      // Crimson wine — deep intensity
+const TYPE_QUALIFIER_COLOR: Color     = Color::from_rgba(255, 190, 150, 255);   // Peach — warmth and tenderness
+pub const COMPOSITE_TYPE_COLOR: Color = Color::from_rgba(200, 90, 255, 255);    // Violet silk — romantic complexity
+const MISC_COLOR: Color               = Color::from_rgba(255, 110, 130, 255);   // Coral — playful affection
+const DATA_TYPE_COLOR: Color          = Color::from_rgba(230, 120, 90, 255);
+const NUMBER_LITERAL_COLOR: Color     = Color::from_rgba(255, 230, 205, 255);
+const STRING_LITERAL_COLOR: Color     = Color::from_rgba(240, 5, 5, 255);
+const COMMENT_COLOR: Color            = Color::from_rgba(255, 100, 0, 255);
+const CURSOR_COLOR: Color             = Color::from_rgba(255, 200, 190, 255);
+const MACRO_COLOR: Color              = Color::from_rgba(255, 60, 100, 255);    // Candy red — invitation
+const MAIN_COLOR: Color               = Color::from_rgba(200, 120, 145, 255); 
 
 const C_CONTROL_FLOW_STATEMENTS: [&str ; 12] = [
     "if",

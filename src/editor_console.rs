@@ -61,7 +61,7 @@ impl EditorConsole {
             screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS - 5.0,
             CONSOLE_MARGINS + 15.0,
             30.0,
-            COMPOSITE_TYPE_COLOR
+            STORAGE_CLASS_COLOR
         );
     }
 

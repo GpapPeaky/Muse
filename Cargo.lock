@@ -7,6 +7,7 @@ name = "Muse"
 version = "0.1.0"
 dependencies = [
  "macroquad",
+ "miniquad",
  "once_cell",
  "regex",
 ]

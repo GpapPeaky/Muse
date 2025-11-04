@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use miniquad::{conf::Icon};
 
 mod editor_console;
 use editor_console::*;
@@ -12,7 +13,22 @@ use editor_cursor::*;
 mod editor_text;
 use editor_text::*;
 
-#[macroquad::main("Muse")]
+/// Window configuration
+fn window_conf() -> Conf {
+    let icon = Icon {
+        small: *include_bytes!("../assets/icon/muse16.bin"),   // 16x16 RGBA
+        medium: *include_bytes!("../assets/icon/muse32.bin"),  // 32x32 RGBA
+        big: *include_bytes!("../assets/icon/muse64.bin"),     // 64x64 RGBA
+    };
+
+    Conf {
+        window_title: "Muse".to_string(),
+        icon: Some(icon),
+        ..Default::default()
+    }
+}
+
+#[macroquad::main(window_conf)]
 async fn main() {
     set_fullscreen(true);
     
