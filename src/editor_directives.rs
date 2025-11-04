@@ -72,6 +72,10 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem) {
         let directive_command = directive.trim_matches(':');
 
         match directive_command {
+            "od" => {
+                efs.open_file_explorer();
+            }
+
             "cd" => {
                 // Get the parameter
                 let tokens: Vec<&str> = directive_command.split_whitespace().collect();
@@ -79,7 +83,8 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem) {
                 if let Some(parameter) = tokens.get(1) {
                     efs.change_current_directory(parameter.to_string());
                 } else {
-                    // TODO Throw error message
+                    // TODO; Needs a timer
+                    // draw_text("DIRECTORY {parameter} NOT FOUND", x, y, font_size, color)
                 }
             }
 
@@ -103,7 +108,11 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem) {
 
         }
     } else {
-        // File switch
+        // Simple file switch
+        if !efs.change_current_file(directive.to_string()) {
+            // TODO: Needs a timer
+            // draw_text("FILE {diretive.to_string()} NOT FOUND", x, y, font_size, color)
+        }
     }
 
     // Remove dat shii

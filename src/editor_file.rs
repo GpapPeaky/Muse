@@ -1,3 +1,5 @@
+use rfd::*;
+
 use std::path::{Path, PathBuf};
 
 pub struct EditorFileSystem {
@@ -10,6 +12,24 @@ impl EditorFileSystem {
         EditorFileSystem {
             current_dir: None,
             current_file: None
+        }
+    }
+
+    /// Open native file explorer, via the Rust File Dialog
+    /// crate.
+    pub fn open_file_explorer(&mut self) {
+        let mut dialog = FileDialog::new();
+
+        // If we already have a current directory, set it as the starting directory
+        if let Some(dir) = &self.current_dir {
+            dialog = dialog.set_directory(dir);
+        }
+
+        // Open a folder picker dialog
+        if let Some(folder) = dialog.pick_folder() {
+            self.current_dir = Some(folder);
+        } else {
+            // TODO: throw console message here
         }
     }
 
