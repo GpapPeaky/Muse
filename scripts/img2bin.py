@@ -1,7 +1,6 @@
 from PIL import Image
 import os
 
-# Define your icon sizes and paths
 icon_sizes = [16, 32, 64]  # small, medium, big
 input_folder = "assets/icon/"
 output_folder = "assets/icon/"
