@@ -61,7 +61,7 @@ pub const BACKGROUND_COLOR: Color     = Color::from_rgba(25, 0, 20, 255);       
 const IDENTIFIER_COLOR: Color         = Color::from_rgba(247, 180, 10, 255);
 const PUNCTUATION_COLOR: Color        = Color::from_rgba(225, 185, 135, 255);
 const CONTROL_FLOW_COLOR: Color       = Color::from_rgba(255, 80, 180, 255);    // Fuchsia pulse — flowing emotion
-pub const STORAGE_CLASS_COLOR: Color  = Color::from_rgba(170, 0, 80, 255);      // Crimson wine — deep intensity
+pub const STORAGE_CLASS_COLOR: Color  = Color::from_rgba(210, 0, 80, 255);      // Crimson wine — deep intensity
 const TYPE_QUALIFIER_COLOR: Color     = Color::from_rgba(255, 190, 150, 255);   // Peach — warmth and tenderness
 pub const COMPOSITE_TYPE_COLOR: Color = Color::from_rgba(200, 90, 255, 255);    // Violet silk — romantic complexity
 const MISC_COLOR: Color               = Color::from_rgba(255, 110, 130, 255);   // Coral — playful affection
@@ -405,7 +405,7 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     let line_spacing = gts.font_size as f32;
     let line_start_relative_to_font_size_fix = gts.font_size as f32 * 1.5;
 
-    draw_line(0.0, MODE_Y_MARGIN + MODE_FONT_SIZE, screen_width(), MODE_Y_MARGIN + MODE_FONT_SIZE, 1.0, COMPOSITE_TYPE_COLOR);
+    draw_line(0.0, MODE_Y_MARGIN + MODE_FONT_SIZE + 25.0, screen_width(), MODE_Y_MARGIN + MODE_FONT_SIZE + 25.0, 1.0, COMPOSITE_TYPE_COLOR);
     
     if !console.mode {
         // Draw text cursor
@@ -430,7 +430,7 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
 
             draw_rectangle(
                 cursor_x_pos,
-                cursor_y_pos - gts.font_size as f32 * 0.8,
+                cursor_y_pos - gts.font_size as f32 * 0.8 + 25.0,
                 cursor_width,
                 gts.font_size as f32,
                 CURSOR_COLOR,
@@ -479,7 +479,7 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
 
             // Draw token at once using the general text stylizer
             gts.color = color;
-            gts.draw(token, x, y);
+            gts.draw(token, x, y + 25.0);
             // draw_text(token, x, y, gts.font_size, color);
 
             // More effective cursor movement
@@ -501,7 +501,7 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
 
     for i in 0..text_len {
         gts.draw(&i.to_string(), FILE_LINE_NUMBER_X_MARGIN,
-            1.1 * FILE_TEXT_X_MARGIN + FILE_LINE_NUMBER_Y_MARGIN + gts.font_size as f32 * i as f32
+            1.1 * FILE_TEXT_X_MARGIN + FILE_LINE_NUMBER_Y_MARGIN + gts.font_size as f32 * i as f32 + 25.0
         );
     }
 

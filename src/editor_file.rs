@@ -36,15 +36,21 @@ impl EditorFileSystem {
     /// Change to another cwd, cd use ,
     /// returns true if the change was valid, else false
     pub fn change_current_directory(&mut self, p: String) -> bool {
-        let path = Path::new(&p);
-
-        if path.is_dir() {
-            self.current_dir = Some(path.to_path_buf());
-
-            true
-        } else {
-            false
+        let base = self.current_dir.clone().unwrap_or_else(|| std::env::current_dir().unwrap());
+    
+        let new_path = base.join(p);
+    
+        // Resolve ../ and ./
+        let canonical = std::fs::canonicalize(&new_path);
+    
+        if let Ok(valid_path) = canonical {
+            if valid_path.is_dir() {
+                self.current_dir = Some(valid_path);
+                return true;
+            }
         }
+    
+        false
     }
 
     /// Change to another file inside the current directory
@@ -71,5 +77,17 @@ pub fn path_buffer_to_string(pb: &Option<PathBuf>) -> String {
         path.display().to_string()
     } else {
         return "".to_string();
+    }
+}
+
+/// Get the path to the file, then trim it to only get the file text
+pub fn path_buffer_file_to_string(pb: &Option<PathBuf>) -> String {
+    if let Some(path) = pb {
+        path.file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("")
+            .to_string()
+    } else {
+        String::new()
     }
 }

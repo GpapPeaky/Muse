@@ -61,6 +61,15 @@ impl EditorConsole {
             COMPOSITE_TYPE_COLOR
         );
 
+        let directive_len: f32 = measure_text(&self.directive, None, 30, 1.0).width;
+
+        draw_line(screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS + directive_len
+            ,CONSOLE_MARGINS
+            ,screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS + directive_len,
+            CONSOLE_MARGINS + 15.0,
+            2.0,
+            STORAGE_CLASS_COLOR);
+
         draw_text(&self.directive,
             screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS - 5.0,
             CONSOLE_MARGINS + 15.0,
