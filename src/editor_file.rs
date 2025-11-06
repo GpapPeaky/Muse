@@ -35,22 +35,26 @@ impl EditorFileSystem {
 
     /// Change to another cwd, cd use ,
     /// returns true if the change was valid, else false
-    pub fn change_current_directory(&mut self, p: String) -> bool {
+    pub fn change_current_directory(&mut self, p: impl AsRef<Path>) -> bool {
         let base = self.current_dir.clone().unwrap_or_else(|| std::env::current_dir().unwrap());
+        let new_path = base.join(p.as_ref());
     
-        let new_path = base.join(p);
-    
-        // Resolve ../ and ./
-        let canonical = std::fs::canonicalize(&new_path);
-    
-        if let Ok(valid_path) = canonical {
-            if valid_path.is_dir() {
+        match std::fs::canonicalize(&new_path) {
+            Ok(valid_path) if valid_path.is_dir() => {
+                println!("Changed to: {}", valid_path.display());
+                std::env::set_current_dir(&valid_path).ok();
                 self.current_dir = Some(valid_path);
-                return true;
+                true
+            }
+            Ok(valid_path) => {
+                eprintln!("Not a dir: {}", valid_path.display());
+                false
+            }
+            Err(e) => {
+                eprintln!("Invalid path {:?}: {}", new_path, e);
+                false
             }
         }
-    
-        false
     }
 
     /// Change to another file inside the current directory
@@ -70,13 +74,10 @@ impl EditorFileSystem {
 }
 
 /// Get a path buffer as a string
-pub fn path_buffer_to_string(pb: &Option<PathBuf>) -> String {
-    if *pb != None {
-        let path: &Path = &pb.as_ref().unwrap();
-
-        path.display().to_string()
-    } else {
-        return "".to_string();
+pub fn path_buffer_to_string(p: &Option<std::path::PathBuf>) -> String {
+    match p {
+        Some(path) => path.display().to_string(),
+        None => "</>".to_string(),
     }
 }
 

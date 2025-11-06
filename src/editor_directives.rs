@@ -71,26 +71,24 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem) {
     if directive.starts_with(':') {
         let directive_command = directive.trim_matches(':');
 
-        match directive_command {
+        let mut tokens = directive_command.split_whitespace();
+        let command = tokens.next().unwrap_or("");
+        let parameter = tokens.next(); // Option<&str>
+
+        match command {
             "od" => {
                 efs.open_file_explorer();
             }
 
             "cd" => {
-                // Get the parameter
-                let tokens: Vec<&str> = directive_command.split_whitespace().collect();
-
-                if let Some(parameter) = tokens.get(1) {
+                if let Some(parameter) = parameter {
                     efs.change_current_directory(parameter.to_string());
                 } else {
-                    // TODO; Needs a timer
-                    // draw_text("DIRECTORY {parameter} NOT FOUND", x, y, font_size, color)
+                    println!("No directory provided for :cd");
                 }
             }
 
-            "e" => {
-                exit(0);
-            }
+            "e" => exit(0),
 
             "ewt" => {
                 // TODO: Add an options object
@@ -104,6 +102,7 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem) {
             _ => {
                 // TODO: Needs a timer
                 // draw_text("INVALID DIRECTIVE", x, y, font_size, color)
+                println!("Invalid directive {}", command);
             }
 
         }
