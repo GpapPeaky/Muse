@@ -11,6 +11,7 @@ use regex::Regex;
 
 use crate::editor_audio::EditorAudio;
 
+use crate::editor_console::editor_file::EditorFileSystem;
 use crate::editor_cursor::*;
 
 use crate::editor_console::EditorConsole;
@@ -153,9 +154,10 @@ fn calibrate_string_color(string: &str) -> Color {
 }
 
 /// Record special key presses
-pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer) -> bool {
+pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer, efs: &mut EditorFileSystem) -> bool {
     if is_key_pressed(KeyCode::Backspace) {
         audio.play_delete();
+        efs.unsaved_changes = true;
 
         if text.is_empty() {
             return true;
@@ -174,6 +176,7 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
                 cursor.xy.0 = text[cursor.xy.1].chars().count();
                 text[cursor.xy.1].push_str(&current_line);
             }
+
             return true;
         }
     
@@ -189,6 +192,7 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
             if &line[start_byte..end_byte] == TAB_PATTERN {
                 line.replace_range(start_byte..end_byte, "");
                 cursor.xy.0 -= TAB_SIZE;
+
                 return true;
             }
         }
@@ -210,6 +214,8 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
         let byte_idx = char_to_byte(line, cursor.xy.0);
         line.insert_str(byte_idx, TAB_PATTERN);
         cursor.xy.0 += TAB_SIZE;
+
+        efs.unsaved_changes = true;
         return true;
     }
 
@@ -225,6 +231,8 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
         cursor.xy.0 = 0;
         
         text.insert(cursor.xy.1, rest);
+
+        efs.unsaved_changes = true;
         return true;
     }
 
@@ -258,19 +266,21 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
 }
 
 /// Standard key recording function
-pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer) {
+pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer, efs: &mut EditorFileSystem) {
     // let c = get_char_pressed().unwrap(); // Unwrap removes the Result/Option wrapper.
 
     if text.is_empty() { // Allocate memory for a new string
         text.push(String::new());
     }
 
-    if record_special_keys(cursor, text, audio, console, gts) {
+    if record_special_keys(cursor, text, audio, console, gts, efs) {
         return; // Handle the special key and terminate the call, as to 
         // not record any special escape character
     }
 
     if let Some(c) = get_char_pressed() {
+        efs.unsaved_changes = true;
+
         // We will also handle smart/smarter identation here.
         while cursor.xy.1 >= text.len() {
             text.push(String::new());
@@ -393,8 +403,6 @@ pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<St
                 cursor.xy.0 += 1;
             }
         }
-        
-        
     }
 }
 

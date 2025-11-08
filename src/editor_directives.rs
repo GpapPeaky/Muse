@@ -59,8 +59,6 @@
 
 use crate::editor_console::editor_file::*;
 
-// TODO Add unsaved file changes indicator.
-
 /// Check if there is a ':', trim it, match it to a directive and execute it
 /// else we will see it as switch-to-file operation
 pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, text: &mut Vec<String>) {

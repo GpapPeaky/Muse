@@ -53,15 +53,27 @@ async fn main() {
         clear_background(BACKGROUND_COLOR);
 
         if !console.mode {
-            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts);
+            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts, &mut efs);
+
+            let mut fname = path_buffer_file_to_string(&efs.current_file);
+            if efs.unsaved_changes {
+                fname = format!("*{}", path_buffer_file_to_string(&efs.current_file));
+            }
+
             draw_text("INSERT MODE", 15.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR);
             draw_text(&path_buffer_to_string(&efs.current_dir), insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, BLUE);
-            draw_text(&path_buffer_file_to_string(&efs.current_file), insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, YELLOW);
+            draw_text(&fname, insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, YELLOW);
         } else {
             console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text);
+            
+            let mut fname = path_buffer_file_to_string(&efs.current_file);
+            if efs.unsaved_changes {
+                fname = format!("*{}", path_buffer_file_to_string(&efs.current_file));
+            }
+            
             draw_text("CONSOLE MODE", 15.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR,);
             draw_text(&path_buffer_to_string(&efs.current_dir), console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, BLUE);
-            draw_text(&path_buffer_file_to_string(&efs.current_file), console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, YELLOW);
+            draw_text(&fname, console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, YELLOW);
         }
 
         draw(&mut file_text, file_cursor.xy.0, file_cursor.xy.1, &mut gts, &console);

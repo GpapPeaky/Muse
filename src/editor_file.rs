@@ -5,14 +5,16 @@ use std::io::Write;
 
 pub struct EditorFileSystem {
     pub current_dir: Option<PathBuf>,
-    pub current_file: Option<PathBuf>
+    pub current_file: Option<PathBuf>,
+    pub unsaved_changes: bool
 }
 
 impl EditorFileSystem {
     pub fn new() -> Self {
         EditorFileSystem {
             current_dir: None,
-            current_file: None
+            current_file: None,
+            unsaved_changes: false
         }
     }
 
@@ -29,7 +31,7 @@ impl EditorFileSystem {
     }
 
     /// Write a Vec<String> back to the current file
-    pub fn write_current_file(&self, text: &[String]) -> io::Result<()> {
+    pub fn write_current_file(&mut self, text: &[String]) -> io::Result<()> {
         if let Some(ref file) = self.current_file {
             let path = self.current_dir.as_ref().unwrap_or(&std::env::current_dir().unwrap()).join(file);
             let mut f = fs::File::create(path)?;
@@ -37,6 +39,8 @@ impl EditorFileSystem {
             for line in text {
                 writeln!(f, "{}", line)?;
             }
+
+            self.unsaved_changes = false;
         }
 
         Ok(())
@@ -104,7 +108,6 @@ impl EditorFileSystem {
         false
     }
 
-    // TODO: problem when switching to a new file, the contents of the other stay in sight.
     /// Create a file of name <fname>
     /// returns true if it was successful
     /// false if not, or if the file with that name already exists
