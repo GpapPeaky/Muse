@@ -79,7 +79,6 @@ async fn main() {
                 fname = format!("*{}", path_buffer_file_to_string(&efs.current_file));
             }
             
-            
             draw_text("CONSOLE MODE", 15.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR,);
             draw_text(&path_buffer_to_string(&efs.current_dir), console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, FOLDER_COLOR);
             draw_text(&fname, console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, FILE_COLOR);
@@ -87,7 +86,7 @@ async fn main() {
         
         draw(&mut file_text, file_cursor.xy.0, file_cursor.xy.1, &mut gts, &console);
         if console.mode {
-            draw_dir_contents(&efs.current_file, &efs.current_dir);
+            draw_dir_contents(&efs.current_file, &efs.current_dir, console.directive.to_string());
         }
         
         next_frame().await;

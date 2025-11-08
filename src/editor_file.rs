@@ -170,12 +170,11 @@ pub fn path_buffer_file_to_string(pb: &Option<PathBuf>) -> String {
 /// Display files and folders in the current working directory.
 /// Highlights the currently open file.
 /// When typing in the console, only the ones matching the text input will be shown.
-pub fn draw_dir_contents(current_file: &Option<PathBuf>, current_dir: &Option<PathBuf>) {
+pub fn draw_dir_contents(current_file: &Option<PathBuf>, current_dir: &Option<PathBuf>, switch_to_file_directive: String) {
     let Some(dir) = current_dir else {
         return;
     };
 
-    // Get directory entries
     let entries = match fs::read_dir(dir) {
         Ok(entries) => entries,
         Err(_) => return,
@@ -189,7 +188,12 @@ pub fn draw_dir_contents(current_file: &Option<PathBuf>, current_dir: &Option<Pa
         let file_name = entry.file_name();
         let file_name_str = file_name.to_string_lossy();
 
-        // Highlight current file (green), directories (blue), and others (yellow)
+        if !switch_to_file_directive.is_empty() && !switch_to_file_directive.starts_with(':') {
+            if !file_name_str.contains(&switch_to_file_directive) {
+                continue;
+            }
+        }
+
         let color = if Some(&path) == current_file.as_ref() {
             SELECTED_FILE_COLOR
         } else if path.is_dir() {
@@ -199,8 +203,6 @@ pub fn draw_dir_contents(current_file: &Option<PathBuf>, current_dir: &Option<Pa
         };
 
         draw_text(&file_name_str, x, y, 24.0, color);
-
         y += 20.0;
     }
 }
-
