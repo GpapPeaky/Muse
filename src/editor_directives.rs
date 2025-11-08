@@ -82,6 +82,7 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                     }
 
                     efs.change_current_file(param.to_string());
+                    *text = efs.load_current_file().unwrap_or_default();
                 } else {
                     // println!("No name provided for :c");
                 }
@@ -91,8 +92,14 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                 if let Some(param) = parameter {
                     efs.change_current_directory(param.to_string());
 
-                    if let Some(_) = &efs.current_file {
-                        *text = efs.load_current_file().unwrap_or_default();
+                    if let Some(current_file) = &efs.current_file {
+                        let path = efs.current_dir.clone().unwrap_or_default().join(current_file);
+                        if path.exists() {
+                            *text = efs.load_current_file().unwrap_or_default();
+                        } else {
+                            println!("File not found in new directory");
+                            return; //
+                        }
                     }
                 } else {
                     // println!("No directory provided for :cd");
@@ -110,9 +117,12 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
     } else {
         // File switch
         if efs.change_current_file(directive.to_string()) {
+            text.clear();
             *text = efs.load_current_file().unwrap_or_default();
         } else {
-            // println!("File not found: {}", directive);
+            text.clear();
+            efs.current_file = None;
+            println!("File not found: {}", directive);
         }
     }
 
