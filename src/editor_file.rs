@@ -183,7 +183,7 @@ pub fn draw_dir_contents(current_file: &Option<PathBuf>, current_dir: &Option<Pa
     };
 
     let mut y = 50.0 + CONSOLE_MARGINS;
-    let x = screen_width() - CONSOLE_WIDTH;
+    let x = screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS;
 
     for entry in entries.flatten() {
         let path = entry.path();

@@ -49,20 +49,20 @@ const FILE_TEXT_Y_MARGIN: f32 = 80.0;
 const TAB_SIZE: usize = 6;
 const TAB_PATTERN: &str = "      ";
 
-pub const BACKGROUND_COLOR: Color     = Color::from_rgba(25, 0, 20, 255);       // Wine velvet — intimate depth
-const IDENTIFIER_COLOR: Color         = Color::from_rgba(247, 180, 10, 255);
-const PUNCTUATION_COLOR: Color        = Color::from_rgba(225, 185, 135, 255);
-const CONTROL_FLOW_COLOR: Color       = Color::from_rgba(255, 80, 180, 255);    // Fuchsia pulse — flowing emotion
-pub const STORAGE_CLASS_COLOR: Color  = Color::from_rgba(210, 0, 80, 255);      // Crimson wine — deep intensity
-const TYPE_QUALIFIER_COLOR: Color     = Color::from_rgba(255, 190, 150, 255);   // Peach — warmth and tenderness
-pub const COMPOSITE_TYPE_COLOR: Color = Color::from_rgba(200, 90, 255, 255);    // Violet silk — romantic complexity
-const MISC_COLOR: Color               = Color::from_rgba(255, 110, 130, 255);   // Coral — playful affection
-const DATA_TYPE_COLOR: Color          = Color::from_rgba(230, 120, 90, 255);
-const NUMBER_LITERAL_COLOR: Color     = Color::from_rgba(255, 230, 205, 255);
-const STRING_LITERAL_COLOR: Color     = Color::from_rgba(240, 5, 5, 255);
-const COMMENT_COLOR: Color            = Color::from_rgba(255, 100, 0, 255);
-const CURSOR_COLOR: Color             = Color::from_rgba(255, 200, 190, 255);
-const MACRO_COLOR: Color              = Color::from_rgba(255, 60, 100, 255);    // Candy red — invitation
+pub const BACKGROUND_COLOR: Color     = Color::from_rgba(18, 12, 34, 255);   // deep midnight violet
+pub const STORAGE_CLASS_COLOR: Color  = Color::from_rgba(255, 165, 90, 255);  // cyber orange
+pub const COMPOSITE_TYPE_COLOR: Color = Color::from_rgba(140, 120, 255, 255); // violet glow
+const TYPE_QUALIFIER_COLOR: Color     = Color::from_rgba(200, 190, 220, 255); // soft lilac
+const MISC_COLOR: Color               = Color::from_rgba(255, 140, 200, 255); // pink electric
+const IDENTIFIER_COLOR: Color         = Color::from_rgba(255, 50, 50, 255);
+const CONTROL_FLOW_COLOR: Color       = Color::from_rgba(255, 0, 0, 255);
+const PUNCTUATION_COLOR: Color        = Color::from_rgba(255, 255, 0, 255);
+const DATA_TYPE_COLOR: Color          = Color::from_rgba(255, 0, 255, 255);
+const NUMBER_LITERAL_COLOR: Color     = Color::from_rgba(200, 200, 200, 255);
+const STRING_LITERAL_COLOR: Color     = Color::from_rgba(0, 255, 255, 255);
+const CURSOR_COLOR: Color             = Color::from_rgba(240, 0, 70, 255);
+const MACRO_COLOR: Color              = Color::from_rgba(45, 100, 195, 255);
+const COMMENT_COLOR: Color            = Color::from_rgba(20, 200, 20, 255);
 
 const C_CONTROL_FLOW_STATEMENTS: [&str ; 12] = [
     "if",
