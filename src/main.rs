@@ -14,6 +14,9 @@ use editor_cursor::*;
 mod editor_text;
 use editor_text::*;
 
+mod editor_pallete;
+use editor_pallete::*;
+
 /// Window configuration
 fn window_conf() -> Conf {
     let icon = Icon {
@@ -61,8 +64,8 @@ async fn main() {
             }
 
             draw_text("INSERT MODE", 15.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR);
-            draw_text(&path_buffer_to_string(&efs.current_dir), insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, BLUE);
-            draw_text(&fname, insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, YELLOW);
+            draw_text(&path_buffer_to_string(&efs.current_dir), insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, FOLDER_COLOR);
+            draw_text(&fname, insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, FILE_COLOR);
         } else {
             console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text);
             
@@ -73,8 +76,8 @@ async fn main() {
             
             
             draw_text("CONSOLE MODE", 15.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR,);
-            draw_text(&path_buffer_to_string(&efs.current_dir), console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, BLUE);
-            draw_text(&fname, console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, YELLOW);
+            draw_text(&path_buffer_to_string(&efs.current_dir), console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, FOLDER_COLOR);
+            draw_text(&fname, console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, FILE_COLOR);
         }
         
         draw(&mut file_text, file_cursor.xy.0, file_cursor.xy.1, &mut gts, &console);

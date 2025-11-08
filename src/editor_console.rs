@@ -15,6 +15,10 @@ use editor_directives::*;
 mod editor_console_cursor;
 use editor_console_cursor::*;
 
+#[path = "editor_pallete.rs"]
+mod editor_pallete;
+use editor_pallete::*;
+
 use crate::{editor_audio::EditorAudio, editor_text::*};
 
 pub struct EditorConsole {
@@ -42,7 +46,7 @@ impl EditorConsole {
             0.0,
             CONSOLE_WIDTH,
             screen_height(),
-            COMPOSITE_TYPE_COLOR
+            CONSOLE_FRAME_COLOR
         );
 
         // Console foreground
@@ -50,7 +54,7 @@ impl EditorConsole {
             0.0,
             CONSOLE_WIDTH,
             screen_height(),
-            BACKGROUND_COLOR
+            CONSOLE_CONTAINER_COLOR
         );
 
         draw_line(screen_width() - CONSOLE_WIDTH,
@@ -58,7 +62,7 @@ impl EditorConsole {
             screen_width(),
             CONSOLE_MARGINS + 25.0,
             1.0,
-            COMPOSITE_TYPE_COLOR
+            CONSOLE_FRAME_COLOR
         );
 
         let directive_len: f32 = measure_text(&self.directive, None, 30, 1.0).width;
@@ -68,13 +72,13 @@ impl EditorConsole {
             ,screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS + directive_len,
             CONSOLE_MARGINS + 15.0,
             2.0,
-            STORAGE_CLASS_COLOR);
+            CONSOLE_CURSOR_COLOR);
 
         draw_text(&self.directive,
             screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS - 5.0,
             CONSOLE_MARGINS + 15.0,
             30.0,
-            STORAGE_CLASS_COLOR
+            CONSOLE_TEXT_COLOR
         );
     }
 
@@ -123,11 +127,11 @@ impl EditorConsole {
         self.record_special_console_keys(audio, efs, text);
 
         if let Some(c) = get_char_pressed() {
-            match c {
-                '\u{8}' | '\r' | '\n' | '\t' => {
-                    return;
-                }
+            if c.is_control() || c.is_ascii_control() {
+                return;
+            }
 
+            match c {
                 _ => {
                     if c != ' ' { 
                         audio.play_insert();

@@ -1,10 +1,10 @@
-use macroquad::{color::{BLUE, GREEN, YELLOW}, text::draw_text, window::screen_width};
+use macroquad::{text::draw_text, window::screen_width};
 use rfd::*;
 
 use std::{fs, io, path::{Path, PathBuf}};
 use std::io::Write;
 
-use crate::editor_console::{CONSOLE_MARGINS, CONSOLE_WIDTH};
+use crate::{editor_console::{CONSOLE_MARGINS, CONSOLE_WIDTH, editor_pallete::{FILE_COLOR, FOLDER_COLOR}}, editor_pallete::SELECTED_FILE_COLOR};
 
 pub struct EditorFileSystem {
     pub current_dir: Option<PathBuf>,
@@ -125,7 +125,6 @@ impl EditorFileSystem {
         false
     }
 
-
     /// Create a file of name <fname>
     /// returns true if it was successful
     /// false if not, or if the file with that name already exists
@@ -192,11 +191,11 @@ pub fn draw_dir_contents(current_file: &Option<PathBuf>, current_dir: &Option<Pa
 
         // Highlight current file (green), directories (blue), and others (yellow)
         let color = if Some(&path) == current_file.as_ref() {
-            GREEN
+            SELECTED_FILE_COLOR
         } else if path.is_dir() {
-            BLUE
+            FOLDER_COLOR
         } else {
-            YELLOW
+            FILE_COLOR
         };
 
         draw_text(&file_name_str, x, y, 24.0, color);

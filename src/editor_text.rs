@@ -17,6 +17,10 @@ use crate::editor_console::EditorConsole;
 #[path = "editor_cursor.rs"]
 mod editor_cursor;
 
+#[path = "editor_pallete.rs"]
+mod editor_pallete;
+use editor_pallete::*;
+
 pub struct EditorGeneralTextStylizer {
     pub font: Font,
     pub font_size: u16,
@@ -48,21 +52,6 @@ const FILE_TEXT_X_MARGIN: f32 = 50.0;
 const FILE_TEXT_Y_MARGIN: f32 = 80.0;
 const TAB_SIZE: usize = 6;
 const TAB_PATTERN: &str = "      ";
-
-pub const BACKGROUND_COLOR: Color     = Color::from_rgba(18, 12, 34, 255);   // deep midnight violet
-pub const STORAGE_CLASS_COLOR: Color  = Color::from_rgba(255, 165, 90, 255);  // cyber orange
-pub const COMPOSITE_TYPE_COLOR: Color = Color::from_rgba(140, 120, 255, 255); // violet glow
-const TYPE_QUALIFIER_COLOR: Color     = Color::from_rgba(200, 190, 220, 255); // soft lilac
-const MISC_COLOR: Color               = Color::from_rgba(255, 140, 200, 255); // pink electric
-const IDENTIFIER_COLOR: Color         = Color::from_rgba(255, 50, 50, 255);
-const CONTROL_FLOW_COLOR: Color       = Color::from_rgba(255, 0, 0, 255);
-const PUNCTUATION_COLOR: Color        = Color::from_rgba(255, 255, 0, 255);
-const DATA_TYPE_COLOR: Color          = Color::from_rgba(255, 0, 255, 255);
-const NUMBER_LITERAL_COLOR: Color     = Color::from_rgba(200, 200, 200, 255);
-const STRING_LITERAL_COLOR: Color     = Color::from_rgba(0, 255, 255, 255);
-const CURSOR_COLOR: Color             = Color::from_rgba(240, 0, 70, 255);
-const MACRO_COLOR: Color              = Color::from_rgba(45, 100, 195, 255);
-const COMMENT_COLOR: Color            = Color::from_rgba(20, 200, 20, 255);
 
 const C_CONTROL_FLOW_STATEMENTS: [&str ; 12] = [
     "if",
