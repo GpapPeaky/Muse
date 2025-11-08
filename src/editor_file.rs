@@ -1,7 +1,10 @@
+use macroquad::{color::{BLUE, GREEN, YELLOW}, text::draw_text, window::screen_width};
 use rfd::*;
 
 use std::{fs, io, path::{Path, PathBuf}};
 use std::io::Write;
+
+use crate::editor_console::{CONSOLE_MARGINS, CONSOLE_WIDTH};
 
 pub struct EditorFileSystem {
     pub current_dir: Option<PathBuf>,
@@ -96,17 +99,32 @@ impl EditorFileSystem {
     /// by typing its name in the console
     /// returns true if the change was valid, else false
     pub fn change_current_file(&mut self, f: String) -> bool {
-        if let Some(dir) = &self.current_dir {
-            let file_path = dir.join(&f);
-            if file_path.is_file() {
-                self.current_file = Some(file_path);
-                
-                return true;
+        let Some(dir) = &self.current_dir else {
+            return false;
+        };
+    
+        let entries = match std::fs::read_dir(dir) {
+            Ok(e) => e,
+            Err(_) => return false,
+        };
+    
+        for entry in entries.flatten() {
+            let path = entry.path();
+    
+            // Only match if it's a file and the name matches EXACTLY (case-sensitive)
+            if path.is_file() {
+                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                    if name == f {
+                        self.current_file = Some(path);
+                        return true;
+                    }
+                }
             }
         }
-
+    
         false
     }
+
 
     /// Create a file of name <fname>
     /// returns true if it was successful
@@ -150,10 +168,40 @@ pub fn path_buffer_file_to_string(pb: &Option<PathBuf>) -> String {
     }
 }
 
-/// Display files and folders in the cwd, highlight the open one.
-/// Can switch to another when clicked.
-/// When typing in the console to switch only the ones matching
-/// whatever is in the console will be shown
-pub fn draw_dir_contents(pb: &Option<PathBuf>) {
-    // TODO
+/// Display files and folders in the current working directory.
+/// Highlights the currently open file.
+/// When typing in the console, only the ones matching the text input will be shown.
+pub fn draw_dir_contents(current_file: &Option<PathBuf>, current_dir: &Option<PathBuf>) {
+    let Some(dir) = current_dir else {
+        return;
+    };
+
+    // Get directory entries
+    let entries = match fs::read_dir(dir) {
+        Ok(entries) => entries,
+        Err(_) => return,
+    };
+
+    let mut y = 50.0 + CONSOLE_MARGINS;
+    let x = screen_width() - CONSOLE_WIDTH;
+
+    for entry in entries.flatten() {
+        let path = entry.path();
+        let file_name = entry.file_name();
+        let file_name_str = file_name.to_string_lossy();
+
+        // Highlight current file (green), directories (blue), and others (yellow)
+        let color = if Some(&path) == current_file.as_ref() {
+            GREEN
+        } else if path.is_dir() {
+            BLUE
+        } else {
+            YELLOW
+        };
+
+        draw_text(&file_name_str, x, y, 24.0, color);
+
+        y += 20.0;
+    }
 }
+
