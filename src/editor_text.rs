@@ -401,6 +401,12 @@ pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<St
 
 /// Text drawing function
 pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut EditorGeneralTextStylizer, console: &EditorConsole, camera: &mut crate::editor_camera::EditorCamera) {
+    // Occlusion culling
+    let cam_left = camera.offset_x;
+    let cam_right = camera.offset_x + screen_width();
+    let cam_top = camera.offset_y;
+    let cam_bottom = camera.offset_y + screen_height();
+    
     let start_x = FILE_TEXT_X_MARGIN;
     let start_y = FILE_TEXT_Y_MARGIN;
     let line_spacing = gts.font_size as f32;
@@ -445,9 +451,14 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     let mut in_block_comment = false;
 
     for (line_index, line) in text.iter().enumerate() {
-        x = start_x + line_start_relative_to_font_size_fix;
         y = start_y + line_index as f32 * line_spacing;
 
+        // Skip lines not in camera
+        if y + line_spacing < cam_top || y > cam_bottom {
+            continue;
+        }
+        
+        x = start_x + line_start_relative_to_font_size_fix;
         let mut chars = line.chars().peekable();
         while let Some(&c) = chars.peek() {
             #[allow(unused_assignments)]
@@ -575,6 +586,14 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
                         color = calibrate_string_color(clean);
                     }
                 }
+            }
+
+            let token_width = measure_text(&token, Some(&gts.font), gts.font_size, 1.0).width;
+
+            // Skip drawing tokens completely outside camera
+            if x + token_width < cam_left || x > cam_right {
+                x += token_width;
+                continue;
             }
 
             gts.color = color;
