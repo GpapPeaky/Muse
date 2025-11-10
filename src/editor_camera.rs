@@ -20,13 +20,11 @@ impl EditorCamera {
     }
 
      pub fn follow_cursor(&mut self, cursor_x_px: f32, cursor_y_px: f32) {
-        let follow_margin = 50.0; // how close to edge before following
+        let follow_margin = 50.0;
 
-        // UI padding — these are *fixed regions* that must stay visible
         let top_ui_height = MODE_Y_MARGIN + MODE_FONT_SIZE + 25.0;
-        let left_ui_width = FILE_TEXT_X_MARGIN + 80.0; // adjust for sidebar + padding
+        let left_ui_width = FILE_TEXT_X_MARGIN + 80.0;
 
-        // Define camera boundaries in *world-space*
         let min_x = self.offset_x + left_ui_width + follow_margin;
         let max_x = self.offset_x + self.camera_w - follow_margin;
         let min_y = self.offset_y + top_ui_height + follow_margin;
