@@ -53,54 +53,63 @@ pub const FILE_TEXT_Y_MARGIN: f32 = 80.0;
 const TAB_SIZE: usize = 6;
 const TAB_PATTERN: &str = "      ";
 
-const C_CONTROL_FLOW_STATEMENTS: [&str ; 12] = [
-    "if",
-    "else",
-    "switch",
-    "case",
-    "default",
-    "for",
-    "while",
-    "do",
-    "break",
-    "continue",
-    "goto",
-    "return"
+const CONTROL_FLOW_STATEMENTS: [&str; 46] = [
+    "if", "else", "switch", "case", "default",
+    "for", "while", "do", "break", "continue",
+    "goto", "return", "try", "catch", "finally",
+    "throw", "throws", "loop", "match", "yield",
+    "await", "async", "then", "except", "raise",
+    "elif", "when", "until", "unless", "foreach",
+    "in", "from", "select", "where", "defer",
+    "guard", "assert", "panic", "recover",
+    "next", "redo", "exit", "abort", "with",
+    "elif", "end",
 ];
 
-const C_STORAGE_CLASS_SPECIFIERS: [&str ; 5] = [
-    "auto",
-    "static",
-    "extern",
-    "register",
-    "typedef"
+const STORAGE_CLASS_SPECIFIERS: [&str; 18] = [
+    "auto", "static", "extern", "register", "typedef",
+    "mutable", "constexpr", "thread_local", "let", "var",
+    "const", "final", "override", "sealed", "lazy",
+    "owned", "borrowed", "inline",
 ];
 
-const C_TYPE_QUALIFIERS: [&str ; 1] = [
-    "const"
+const TYPE_QUALIFIERS: [&str; 14] = [
+    "const", "volatile", "restrict", "constexpr",
+    "ref", "mut", "transient", "synchronized",
+    "abstract", "readonly", "immutable", "dynamic",
+    "weak", "unsafe",
 ];
 
-const C_COMPOSITE_TYPES: [&str ; 3] = [
-    "struct",
-    "union",
-    "enum"
+const COMPOSITE_TYPES: [&str; 12] = [
+    "struct", "union", "enum", "class", "trait",
+    "interface", "protocol", "record", "object",
+    "impl", "concept", "module",
 ];
 
-const C_MISC: [&str ; 2] = [
-    "sizeof",
-    "inline"
+const MISC: [&str; 39] = [
+    "sizeof", "inline", "virtual", "explicit", "namespace",
+    "using", "operator", "template", "typename", "friend",
+    "crate", "super", "self", "import", "package",
+    "include", "public", "private", "protected", "internal",
+    "static_cast", "reinterpret_cast", "dynamic_cast", "const_cast",
+    "typeof", "instanceof", "new", "delete", "clone",
+    "as", "is", "extends", "implements", "default",
+    "partial", "module", "export", "require", "use",
 ];
 
-const C_DATA_TYPES: [&str ; 9] = [
-    "int",
-    "float",
-    "double",
-    "char",
-    "void",
-    "short",
-    "long",
-    "signed",
-    "unsigned"
+const DATA_TYPES: [&str; 60] = [
+    "int", "float", "double", "char", "void",
+    "short", "long", "signed", "unsigned", "bool",
+    "boolean", "byte", "wchar_t", "auto", "decltype",
+    "nullptr_t", "String", "str", "u8", "u16",
+    "u32", "u64", "u128", "i8", "i16", "i32",
+    "i64", "i128", "f32", "f64", "usize", "isize",
+    "any", "object", "None", "null", "undefined",
+    "map", "list", "array", "tuple", "set", "dict",
+    "Vec", "Option", "Result", "number", "char8_t",
+    "char16_t", "char32_t", "interface", "record", "trait",
+    "enum", "struct", "unit", "string", "symbol",
+    "function", "object",
 ];
 
 /// Convert a provided character index to the actual byte
@@ -113,17 +122,17 @@ pub fn char_to_byte(line: &str, char_idx: usize) -> usize {
 
 /// Calibrate the color of a token
 fn calibrate_string_color(string: &str) -> Color {
-    if C_CONTROL_FLOW_STATEMENTS.contains(&string) {
+    if CONTROL_FLOW_STATEMENTS.contains(&string) {
         return CONTROL_FLOW_COLOR;
-    } else if C_TYPE_QUALIFIERS.contains(&string) {
+    } else if TYPE_QUALIFIERS.contains(&string) {
         return TYPE_QUALIFIER_COLOR;
-    } else if C_COMPOSITE_TYPES.contains(&string) {
+    } else if COMPOSITE_TYPES.contains(&string) {
         return COMPOSITE_TYPE_COLOR;
-    } else if C_STORAGE_CLASS_SPECIFIERS.contains(&string) {
+    } else if STORAGE_CLASS_SPECIFIERS.contains(&string) {
         return STORAGE_CLASS_COLOR;
-    } else if C_MISC.contains(&string) {
+    } else if MISC.contains(&string) {
         return MISC_COLOR;
-    } else if C_DATA_TYPES.contains(&string) {
+    } else if DATA_TYPES.contains(&string) {
         return DATA_TYPE_COLOR;
     } else if string.chars().all(|c| c.is_ascii_digit()) {
         return NUMBER_LITERAL_COLOR;
