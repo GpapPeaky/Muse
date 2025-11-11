@@ -55,11 +55,11 @@
 // Pressing TAB will select the first seen file closest to the name given and autocomplete it
 // in the console.
 
-use crate::editor_console::{console_message, editor_file::*};
+use crate::editor_console::{console_manual, editor_file::*};
 
 /// Check if there is a ':', trim it, match it to a directive and execute it
 /// else we will see it as switch-to-file operation
-pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, text: &mut Vec<String>) {
+pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, text: &mut Vec<String>) -> String {
     if directive.starts_with(':') {
         let directive_command = directive.trim_start_matches(':').trim();
         let mut tokens = directive_command.split_whitespace();
@@ -67,9 +67,9 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
         let parameter = tokens.next();
 
         match command {
-            "od" | "o" => efs.open_file_explorer(),
+            "od" | "o" | "O" | "Od" | "oD" | "OD" => efs.open_file_explorer(),
 
-            "c" => {
+            "c" | "C" => {
                 if let Some(param) = parameter {
                     let r = efs.create_file(param);
 
@@ -80,11 +80,11 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                     efs.change_current_file(param.to_string());
                     *text = efs.load_current_file().unwrap_or_default();
                 } else {
-                    // println!("No name provided for :c");
+                    return "NoFileNameProvided <:c>".to_string();
                 }
             }
 
-            "cd" => {
+            "cd" | "CD" | "Cd" | "cD" => {
                 if let Some(param) = parameter {
                     efs.change_current_directory(param.to_string());
 
@@ -93,22 +93,28 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                         if path.exists() {
                             *text = efs.load_current_file().unwrap_or_default();
                         } else {
-                            println!("File not found in new directory");
-                            return; //
+                            return "FileNotFound".to_string();
                         }
                     }
                 } else {
-                    // println!("No directory provided for :cd");
+                    return "NoDirectoryNameProvided <:cd>".to_string();
                 }
             }
 
-            "w" => {
+            "w" | "W" => {
                 let _ = efs.write_current_file(text);
             }
 
-            "e" | "q" => std::process::exit(0),
+            "e" | "q" | "E" | "Q" => std::process::exit(0),
 
-            _ => println!("Invalid directive: {}", command),
+            // Manuals
+            "egman" => console_manual(0),
+            "efman" => console_manual(1),
+            "edman" => console_manual(2),
+            "ecman" => console_manual(3),
+            "eoman" => console_manual(4),
+
+            _ => return "UnknownDirective".to_string(),
         }
     } else {
         // File switch
@@ -118,9 +124,11 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
         } else {
             text.clear();
             efs.current_file = None;
-            console_message("FileNotFound".to_string());
+            return "FileNotFound".to_string();
         }
     }
 
     *directive = String::new();
+
+    return "".to_string();
 }

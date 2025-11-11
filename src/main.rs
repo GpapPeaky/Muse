@@ -88,6 +88,16 @@ async fn main() {
             draw_text(&path_buffer_to_string(&efs.current_dir), console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, FOLDER_COLOR);
             draw_text(&fname, console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, FILE_COLOR);
         }
+
+        // Show message
+        if console.showing_message {
+            console_message(&console.message);
+
+            if is_key_pressed(KeyCode::Escape) {
+                console.showing_message = false;
+                console.message.clear();
+            }
+        }
         
         next_frame().await;
     }
