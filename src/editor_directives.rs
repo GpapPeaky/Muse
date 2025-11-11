@@ -27,8 +27,8 @@
 //              :bd <f>     : Change the name of the current open directory to 'f'
 //
 //      Conf: <saved in cal.conf file>
-//              :epa  <p>   : Change to pallete of name 'p'
-//              :efn  <p>   : Change to a font of name 'p'
+//              :epa <p>    : Change to pallete of name 'p'
+//              :efn <p>    : Change to a font of name 'p'
 //              :efs <N>    : Change font size to N
 //              :eau        : Audio on/off switch
 //              :eav <N>    : Set editor audio volume to N
@@ -39,12 +39,12 @@
 //
 //      Other:
 //              :e/q        : Exit, close editor                                            (C)
-//              :egman      : Editor general manual (All manuals are displayed)
-//              :efman      : Editor file manual    (Display file directives info)
-//              :edman      : Editor directory manual  (Display directory directives info)
-//              :ecman      : Editor config manual  (Display editor config directives info)
-//              :eoman      : Editor others manual  (Display editor other directives info)
-//              :ever       : Editor version
+//              :egman/man  : Editor general manual (All manuals are displayed)             (C)
+//              :efman      : Editor file manual    (Display file directives info)          (C)
+//              :edman      : Editor directory manual  (Display directory directives info)  (C)
+//              :ecman      : Editor config manual  (Display editor config directives info) (C)
+//              :eoman      : Editor others manual  (Display editor other directives info)  (C)
+//              :ever       : Editor version                                                (C)
 //              :eck        : Editor clock (current time and time opened)
 //              :egam <N>   : Editor gamble, display a number from 0 to N
 //
@@ -59,7 +59,9 @@ use crate::editor_console::{console_manual, editor_file::*};
 
 /// Check if there is a ':', trim it, match it to a directive and execute it
 /// else we will see it as switch-to-file operation
-pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, text: &mut Vec<String>) -> String {
+/// returns a message if there is an error OR a manual to show
+/// as well as boolean to delcare if it's a manual
+pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, text: &mut Vec<String>) -> (String, bool) {
     if directive.starts_with(':') {
         let directive_command = directive.trim_start_matches(':').trim();
         let mut tokens = directive_command.split_whitespace();
@@ -74,13 +76,13 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                     let r = efs.create_file(param);
 
                     if !r {
-                        // println!("File {param} already exists");
+                        return ("FileNameUsed".to_string(), false);
                     }
 
                     efs.change_current_file(param.to_string());
                     *text = efs.load_current_file().unwrap_or_default();
                 } else {
-                    return "NoFileNameProvided <:c>".to_string();
+                    return ("NoFileNameProvided <:c>".to_string(), false);
                 }
             }
 
@@ -93,11 +95,11 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                         if path.exists() {
                             *text = efs.load_current_file().unwrap_or_default();
                         } else {
-                            return "FileNotFound".to_string();
+                            return ("FileNotFound".to_string(), false);
                         }
                     }
                 } else {
-                    return "NoDirectoryNameProvided <:cd>".to_string();
+                    return ("NoDirectoryNameProvided <:cd>".to_string(), false);
                 }
             }
 
@@ -108,13 +110,15 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
             "e" | "q" | "E" | "Q" => std::process::exit(0),
 
             // Manuals
-            "egman" => console_manual(0),
-            "efman" => console_manual(1),
-            "edman" => console_manual(2),
-            "ecman" => console_manual(3),
-            "eoman" => console_manual(4),
+            "egman" | "man" => return (console_manual(0), true),
+            "efman"         => return (console_manual(1), true),
+            "edman"         => return (console_manual(2), true),
+            "ecman"         => return (console_manual(3), true),
+            "eoman"         => return (console_manual(4), true),
 
-            _ => return "UnknownDirective".to_string(),
+            "ever" => return ("Muse v1.2.0".to_string(), false),
+
+            _ => return ("UnknownDirective".to_string(), false),
         }
     } else {
         // File switch
@@ -124,11 +128,11 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
         } else {
             text.clear();
             efs.current_file = None;
-            return "FileNotFound".to_string();
+            return ("FileNotFound".to_string(), false);
         }
     }
 
     *directive = String::new();
 
-    return "".to_string();
+    return ("".to_string(), false);
 }

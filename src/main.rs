@@ -1,3 +1,4 @@
+
 use macroquad::prelude::*;
 use miniquad::{conf::Icon};
 
@@ -38,6 +39,7 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     set_fullscreen(true);
+    show_mouse(false);
     
     // Editor camera
     let mut ec = EditorCamera::new();
@@ -91,10 +93,11 @@ async fn main() {
 
         // Show message
         if console.showing_message {
-            console_message(&console.message);
+            console_message(&console.message, console.showing_manual);
 
             if is_key_pressed(KeyCode::Escape) {
                 console.showing_message = false;
+                console.showing_manual = false;
                 console.message.clear();
             }
         }
