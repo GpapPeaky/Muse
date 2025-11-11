@@ -145,6 +145,22 @@ impl EditorFileSystem {
             Err(_) => false,
         }
     }
+
+    // Delete a file of name <fname>
+    // returns true if it was successful
+    pub fn delete_file(&mut self, fname: &str) -> bool {
+        let Some(dir) = &self.current_dir else {
+            return false;
+        };
+
+        let mut targetfile = dir.clone();
+        targetfile.push(fname);
+
+        match fs::remove_file(&targetfile) {
+            Ok(_) => true,
+            Err(_) => false,
+        }
+    }
 }
 
 /// Get a path buffer as a string

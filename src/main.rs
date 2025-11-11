@@ -92,7 +92,7 @@ async fn main() {
         }
 
         // Show message
-        if console.showing_message {
+        if console.showing_message && console.message != "" {
             console_message(&console.message, console.showing_manual);
 
             if is_key_pressed(KeyCode::Escape) {

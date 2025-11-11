@@ -359,7 +359,7 @@ pub fn console_manual(man_id: u8) -> String {
             }
 
             _ => {
-                text = "Manual requested not found.".to_string();
+                text = "".to_string();
             }
       }
 

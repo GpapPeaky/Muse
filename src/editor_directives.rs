@@ -71,12 +71,24 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
         match command {
             "od" | "o" | "O" | "Od" | "oD" | "OD" => efs.open_file_explorer(),
 
+            "r" | "R" => {
+                if let Some(param) = parameter {
+                    let r = efs.delete_file(param);
+
+                    if !r {
+                        return ("FileNotFound <:r>".to_string(), false);
+                    }
+                } else {
+                    return ("NoFileNameProvided <:r>".to_string(), false);
+                }
+            }
+
             "c" | "C" => {
                 if let Some(param) = parameter {
                     let r = efs.create_file(param);
 
                     if !r {
-                        return ("FileNameUsed".to_string(), false);
+                        return ("FileNameUsed <:c>".to_string(), false);
                     }
 
                     efs.change_current_file(param.to_string());
@@ -95,7 +107,7 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                         if path.exists() {
                             *text = efs.load_current_file().unwrap_or_default();
                         } else {
-                            return ("FileNotFound".to_string(), false);
+                            return ("FileNotFound <:cd>".to_string(), false);
                         }
                     }
                 } else {
