@@ -416,21 +416,16 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     // Draw cursor
     if !console.mode && cursor_y < text.len() {
         let line = &text[cursor_y];
-        let cursor_text = &line[..cursor_x.min(line.len())];
-        let text_before_cursor = measure_text(cursor_text, Some(&gts.font), gts.font_size, 1.0);
-        let cursor_x_pos = start_x + line_start_relative_to_font_size_fix + text_before_cursor.width;
+        let prefix = &line[..cursor_x];
+        let text_before_cursor = measure_text(prefix, Some(&gts.font), gts.font_size, 1.0);
         let cursor_y_pos = start_y + cursor_y as f32 * line_spacing;
-
+        let cursor_x_pos = start_x + line_start_relative_to_font_size_fix + text_before_cursor.width;
+        
         camera.follow_cursor(cursor_x_pos, cursor_y_pos);
-
+        
+        // For cursor width, just measure next char if exists
         let cursor_width = if cursor_x < line.len() {
-            measure_text(
-                &line.chars().nth(cursor_x).unwrap().to_string(),
-                Some(&gts.font),
-                gts.font_size,
-                1.0,
-            )
-            .width
+            measure_text(&line[cursor_x..].chars().next().unwrap().to_string(), Some(&gts.font), gts.font_size, 1.0).width
         } else {
             2.0
         };
@@ -589,19 +584,21 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
                 }
             }
 
-            let token_width = measure_text(&token, Some(&gts.font), gts.font_size, 1.0).width;
+            let rough_width = token.len() as f32 * gts.font_size as f32 * 0.5;
 
-            // Skip drawing tokens completely outside camera
-            if x + token_width < cam_left || x > cam_right {
-                x += token_width;
-                continue;
+            if x + rough_width < cam_left || x > cam_right { 
+                x += rough_width; 
+                continue; 
             }
+
+            // Measure only if inside the camera
+            let token_width = measure_text(&token, Some(&gts.font), gts.font_size, 1.0).width;
 
             gts.color = color;
             let (sx, sy) = camera.world_to_screen(x, y + 25.0);
             gts.draw(&token, sx, sy);
 
-            x += measure_text(&token, Some(&gts.font), gts.font_size, 1.0).width;
+            x += token_width;
         }
     }
 
@@ -612,9 +609,12 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
 
     // Draw line numbers
     gts.color = CURSOR_COLOR;
-    for (i, _) in text.iter().enumerate() {
+
+    let first_visible_line = ((cam_top - start_y) / line_spacing).max(0.0) as usize;
+    let last_visible_line = ((cam_bottom - start_y) / line_spacing).min(text.len() as f32 - 1.0) as usize;
+    for i in first_visible_line..=last_visible_line {
         let line_y_world = 1.1 * FILE_TEXT_X_MARGIN + FILE_LINE_NUMBER_Y_MARGIN + gts.font_size as f32 * i as f32 + 25.0;
-        
+    
         let screen_y = line_y_world - camera.offset_y;
         
         gts.draw(
