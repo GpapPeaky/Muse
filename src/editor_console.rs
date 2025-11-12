@@ -294,6 +294,7 @@ pub fn console_manual(man_id: u8) -> String {
                 :edman      : Editor directory manual  (Display directory directives info)
                 :ecman      : Editor config manual  (Display editor config directives info)
                 :eoman      : Editor others manual  (Display editor other directives info)
+                :ectrl      : Editor controls manual (Display editor controls info)
                 :ever       : Editor version
                 :eck        : Editor clock (current time and time opened)
                 :egam <N>   : Editor gamble, display a number from 0 to N
@@ -352,10 +353,21 @@ pub fn console_manual(man_id: u8) -> String {
                         :edman      : Editor directory manual  (Display directory directives info) 
                         :ecman      : Editor config manual  (Display editor config directives info)
                         :eoman      : Editor others manual  (Display editor other directives info) 
+                        :ectrl      : Editor controls manual (Display editor controls info)
                         :ever       : Editor version                                               
                         :eck        : Editor clock (current time and time opened)
                         :egam <N>   : Editor gamble, display a number from 0 to N
                 ".to_string();
+            }
+
+            5 => {
+               text= "
+                  Infile controls: 
+                     ArrowKeys: Move the cursor index by one vertically/horizontally.
+                     LCtrl + ArrowKeys: Move the cursor index to the next non whitespace character
+                                        horizontally, or by 5 vertically.
+                     LCtrl + LShift + ArrowKeys: Smoothly slide the cursor vertically. 
+               ".to_string();
             }
 
             _ => {

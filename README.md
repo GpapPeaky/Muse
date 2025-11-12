@@ -101,6 +101,7 @@ All configuration changes are saved in `cal.conf`.
 | `:edman` | Display directory directive manual. |
 | `:ecman` | Display editor configuration manual. |
 | `:eoman` | Display other editor directives manual. |
+| `:ectrl` | Display the editor infile controls manual. |
 | `:ever` | Display editor version. |
 | `:eck` | Display editor clock (current time and session time). |
 | `:egam <N>` | Display a random number between 0 and `N`. |

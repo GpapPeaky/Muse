@@ -44,6 +44,7 @@
 //              :edman      : Editor directory manual  (Display directory directives info)  (C)
 //              :ecman      : Editor config manual  (Display editor config directives info) (C)
 //              :eoman      : Editor others manual  (Display editor other directives info)  (C)
+//              :ectrl      : Editor controls manual (Display editor controls info)         (C)
 //              :ever       : Editor version                                                (C)
 //              :eck        : Editor clock (current time and time opened)
 //              :egam <N>   : Editor gamble, display a number from 0 to N
@@ -127,7 +128,7 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
             "edman"         => return (console_manual(2), true),
             "ecman"         => return (console_manual(3), true),
             "eoman"         => return (console_manual(4), true),
-
+            "ectrl"         => return (console_manual(5), true),
             "ever" => return ("Muse v1.2.1".to_string(), false),
 
             _ => return ("UnknownDirective".to_string(), false),
