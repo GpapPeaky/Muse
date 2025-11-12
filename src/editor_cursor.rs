@@ -80,6 +80,52 @@ pub fn file_text_special_navigation(cursor: &mut (usize, usize), text: &mut Vec<
         return;
     }
 
+    let cursor_special_vertical_movement = 5;
+
+    if is_key_down(KeyCode::LeftShift) {
+        // Even faster vertical movement
+        if is_key_down(KeyCode::Up) {
+            if cursor.1 > 1 {
+                audio.play_nav();
+                cursor.1 -= 1;
+            } else if cursor.1 <= 1 {
+                audio.play_nav();
+                cursor.0 = 0;
+            }
+        }
+    
+        if is_key_down(KeyCode::Down) {
+            if cursor.1 + 1 < text.len() {
+                audio.play_nav();
+                cursor.1 += 1;
+            } else {
+                audio.play_nav();
+                cursor.1 = text.len() - 1;
+            }
+        }   
+    } else {
+        // Faster verical movement
+        if is_key_pressed(KeyCode::Up) {
+            if cursor.1 > cursor_special_vertical_movement {
+                audio.play_nav();
+                cursor.1 -= cursor_special_vertical_movement;
+            } else if cursor.1 <= 1 {
+                audio.play_nav();
+                cursor.0 = 0;
+            }
+        }
+    
+        if is_key_pressed(KeyCode::Down) {
+            if cursor.1 + cursor_special_vertical_movement < text.len() {
+                audio.play_nav();
+                cursor.1 += cursor_special_vertical_movement;
+            } else {
+                audio.play_nav();
+                cursor.1 = text.len() - 1;
+            }
+        }
+    }
+
     // Clamp cursor to valid line
     cursor.1 = cursor.1.min(text.len() - 1);
     cursor.0 = cursor.0.min(text[cursor.1].len());
