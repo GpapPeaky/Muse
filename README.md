@@ -5,6 +5,7 @@ A lightweight console-based editor that allows users to manage files, directorie
 ## Table of Contents
 
 - [Modes](#modes)
+- [Text Navigation](#text-navigation)
 - [Console Directives](#console-directives)
   - [File Directives](#file-directives)
   - [Directory Directives](#directory-directives)
@@ -24,6 +25,19 @@ The editor has two main modes:
 - **Insert Mode** – Edit file content.
 
 Switch between modes by pressing: *LCtrl + `*
+
+---
+
+## Text Navigation
+
+We can navigate the current file's text in these ways:
+
+| Keys | Description |
+|-----------|-------------|
+| `ArrowKeys` | Move the cursor index in the file 1 at a time. |
+| `LCtrl + ArrowKeys` | Move the cursor index in the file 5 steps at a time. |
+| `LCtrl + LShift+ ArrowKeys` | Move the cursor index continously up and down, 1 index increment/decrement at a time. |
+| `:l <N>` | Go to line `N` in the current file. Throws an error if invalid. |
 
 ---
 
