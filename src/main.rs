@@ -23,6 +23,11 @@ use editor_text::*;
 mod editor_pallete;
 use editor_pallete::*;
 
+// FIXME: Cursor Y missalignment
+// FIXME: Disable console control characters
+// FIXME: :cd directive autocomplete
+// TODO: Finish all the directives
+
 /// Window configuration
 fn window_conf() -> Conf {
     let icon = Icon {
