@@ -23,10 +23,27 @@ use editor_text::*;
 mod editor_pallete;
 use editor_pallete::*;
 
-// FIXME: Cursor Y missalignment
-// FIXME: Disable console control characters
-// FIXME: :cd directive autocomplete
+// FIXME: Console cursor render moving not left and right through navigation
+// FIXME: Directories split with spaces do not work.
+// FIXME: Text cursor Y missalignment
+// FIXME: Drawing breaks a bit for some invalid directives
+// FIXME: Add is_key_down for arrow keys in text mode, remove
+//        The shift + control + arrow keys functionality 
+// TODO: Add :cd autocomplete with TAB
+// TODO: Add smarter identation
 // TODO: Finish all the directives
+// TODO: Add Ctrl + x shortcut to cut line
+// TODO: Add Ctrl + s shortcut to quickly save the file
+// TODO: Add Ctrl + f shortcut to quickly open the find directive
+// TODO: Add Ctrl + l shortcut to quickly go to line directive
+// TODO: Add Ctrl + z to undo last change
+// TODO: Add selected text functionality
+// TODO: Add Ctrl + c to copy selected text
+// TODO: Add Ctrl + v to paste copied text
+// TODO: Add editor options
+// TODO: Add the palletes
+
+// IDEA: Add a cmd/terminal wrapper maybe, for compiling/executing code and other commands.
 
 pub const VERSION: &str = "Muse-V1.3.1";
 

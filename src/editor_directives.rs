@@ -122,7 +122,7 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
                 }
             }
 
-            "cd" | "CD" | "Cd" | "cD" => { // FIXME: Directories split with spaces do not work.
+            "cd" | "CD" | "Cd" | "cD" => {
                 if let Some(param) = parameter {
                     efs.change_current_directory(param.to_string());
 

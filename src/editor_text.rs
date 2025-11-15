@@ -219,8 +219,6 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
         let rest = line.split_off(char_to_byte(line, cursor.xy.0));
         cursor.xy.1 += 1;
 
-        // TODO: Smarter identation here
-
         cursor.xy.0 = 0;
         
         text.insert(cursor.xy.1, rest);
@@ -438,11 +436,10 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     
         let (sx, sy) = camera.world_to_screen(cursor_x_pos, cursor_y_pos);
         
-        let cursor_width = 2.0;
+        let cursor_width = gts.font_size as f32 / 1.6;
 
-        // FIXME: Find something better for this
         let font_size_y_fix = gts.font_size as f32;
-        draw_rectangle(sx.round(), sy.round() - font_size_y_fix, cursor_width, gts.font_size as f32, CURSOR_COLOR);
+        draw_rectangle(sx.round(), gts.font_size as f32 + sy.round() - font_size_y_fix, cursor_width, 4.0, CURSOR_COLOR);
     }
 
     // Determine visible lines

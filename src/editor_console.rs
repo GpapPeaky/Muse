@@ -73,6 +73,7 @@ impl EditorConsole {
 
         let directive_len: f32 = measure_text(&self.directive, None, 30, 1.0).width;
 
+        // Console cursor
         draw_line(screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS + directive_len
             ,CONSOLE_MARGINS
             ,screen_width() - CONSOLE_WIDTH + CONSOLE_MARGINS + directive_len,
@@ -141,8 +142,9 @@ impl EditorConsole {
     pub fn record_keyboard_to_console_text(&mut self, audio: &EditorAudio, efs: &mut EditorFileSystem, text: &mut Vec<String>, cursor: &mut EditorCursor) {
         self.record_special_console_keys(audio, efs, text, cursor);
 
+        // Disable special characters from the console.
         if let Some(c) = get_char_pressed() {
-            if c.is_control() || c.is_ascii_control() {
+            if !c.is_ascii_alphanumeric() && c != '_' && c != '-' && c != ' ' && c != '.' && c != '/' && c != '\\' && c != ':' && c != '<' && c != '>' {
                 return;
             }
 
@@ -180,7 +182,6 @@ pub fn draw_multiline_text_centered(text: &str, font_size: u16, color: Color, st
         y += line_height;
     }
 }
-
 
 /// Show a message error produced by the console
 pub fn console_message(msg: &String, is_manual: bool) {
