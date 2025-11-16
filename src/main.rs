@@ -28,9 +28,7 @@ use editor_pallete::*;
 // TODO: Add :cd autocomplete with TAB
 // TODO: Finish all the directives
 // TODO: Add Ctrl + f shortcut to quickly open the find directive
-// TODO: Add Ctrl + l shortcut to quickly go to line directive
 // TODO: Add Ctrl + z to undo last change
-// TODO: Add selected text functionality
 // TODO: Add Ctrl + c to copy selected text
 // TODO: Add Ctrl + v to paste copied text
 // TODO: Add editor options
@@ -51,6 +49,9 @@ fn window_conf() -> Conf {
     Conf {
         window_title: "muse".to_string(),
         icon: Some(icon),
+        window_width: 1920,
+        window_height: 1080,
+        window_resizable: true,
         ..Default::default()
     }
 }
