@@ -275,15 +275,11 @@ pub fn console_manual(man_id: u8) -> String {
                 :rd <f>     : Remove a directory with name 'f' with all its contents
                 :bd <f>     : Change the name of the current open directory to 'f'
                     
-                Option specific directives:
-                :epa  <p>   : Change to pallete of name 'p'
-                :efn  <p>   : Change to a font of name 'p'
-                :efs <N>    : Change font size to N
+                Configuration directives:
+                :epa <p>    : Change to pallete of name 'p'
+                :efn <p>    : Change to a font of name 'p'
                 :eau        : Audio on/off switch
                 :eav <N>    : Set editor audio volume to N
-                :esi        : Smart identation on/off switch
-                :efl        : Editor fullscreen switch
-                :ehi        : Editor highlighting toggle
                     
                 Other directives:
                 :e/q                : Exit, close editor                                           
@@ -294,7 +290,6 @@ pub fn console_manual(man_id: u8) -> String {
                 :eoman              : Editor others manual  (Display editor other directives info)
                 :ectrl              : Editor controls manual (Display editor controls info)
                 :ever               : Editor version
-                :eck                : Editor clock (current time and time opened)
                 :egam/rand/roll <N> : Editor gamble, display a number from 0 to N 
                 ".to_string();
             }
@@ -321,22 +316,17 @@ pub fn console_manual(man_id: u8) -> String {
                         :od/o       : Open a directory, create process -> native file explorer
                         :md <f>     : Create a new directory with name 'f'
                         :rd <f>     : Remove a directory with name 'f' with all its contents
-                        :bd <f>     : Change the name of the current open directory to 'f'
                 ".to_string();
             }
             
             // Options manual
             3 => {
                   text = "
-                    Options directives:
-                        :epa  <p>   : Change to pallete of name 'p'
-                        :efn  <p>   : Change to a font of name 'p'
-                        :efs <N>    : Change font size to N
+                    Configuration directives:
+                        :epa <p>    : Change to pallete of name 'p'
+                        :efn <p>    : Change to a font of name 'p'
                         :eau        : Audio on/off switch
                         :eav <N>    : Set editor audio volume to N
-                        :esi        : Smart identation on/off switch
-                        :efl        : Editor fullscreen switch
-                        :ehi        : Editor highlighting toggle
                 ".to_string();
             }
 
@@ -352,7 +342,6 @@ pub fn console_manual(man_id: u8) -> String {
                         :eoman              : Editor others manual  (Display editor other directives info) 
                         :ectrl              : Editor controls manual (Display editor controls info)
                         :ever               : Editor version                                               
-                        :eck                : Editor clock (current time and time opened)
                         :egam/rand/roll <N> : Editor gamble, display a number from 0 to N 
                 ".to_string();
             }

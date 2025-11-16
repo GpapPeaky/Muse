@@ -15,26 +15,21 @@
 //              :r <f>      : Remove a file with name 'f'                                    (C)
 //              :c <f>      : Create a new file with name 'f'                                (C)
 //              :l <N>      : Go to line N inside the file, if possible, else throw an error (C)
-//              :f <f>      : Go to the line where the first iteration of text 'f' exists
-//              :b <f>      : Change the name of the current open file to 'f'
+//              :b <f>      : Change the name of the current open file to 'f'                (C)
 //              :i          : Current file info display
+//              :f <f>      : Go to the line where the first iteration of text 'f' exists
 //
 //      Directory specific:
 //              :cd         : Change directory                                         (C)
 //              :od/o       : Open a directory, create process -> native file explorer (C)
 //              :md <f>     : Create a new directory with name 'f'                     (C)
 //              :rd <f>     : Remove a directory with name 'f' with all its contents   (C)
-//              :bd <f>     : Change the name of the current open directory to 'f'
 //
 //      Conf: <saved in cal.conf file>
 //              :epa <p>    : Change to pallete of name 'p'
 //              :efn <p>    : Change to a font of name 'p'
-//              :efs <N>    : Change font size to N
 //              :eau        : Audio on/off switch
 //              :eav <N>    : Set editor audio volume to N
-//              :esi        : Smart identation on/off switch
-//              :efl        : Editor fullscreen switch
-//              :ehi        : Editor highlighting toggle
 //
 //      Other:
 //              :e/q                : Exit, close editor                                            (C)
@@ -45,7 +40,6 @@
 //              :eoman              : Editor others manual  (Display editor other directives info)  (C)
 //              :ectrl              : Editor controls manual (Display editor controls info)         (C)
 //              :ever               : Editor version                                                (C)
-//              :eck                : Editor clock (current time and time opened)
 //              :egam/rand/roll <N> : Editor gamble, display a number from 0 to N                   (C)
 //
 // When the console is faced with a directive without a ':' prefix
@@ -74,6 +68,29 @@ pub fn execute_directive(directive: &mut String, efs: &mut EditorFileSystem, tex
 
         match command {
             "od" | "o" | "O" | "Od" | "oD" | "OD" => efs.open_file_explorer(),
+
+            "B" | "b" => {
+                if let Some(param) = parameter {
+                    let r = efs.baptize_file(param);
+
+                    if !r {
+                        return ("FileNotFound <:b>".to_string(), false);
+                    }
+                } else {
+                    return ("NoFileNameProvided <:b>".to_string(), false);
+                }
+            }
+
+            // Very problematic, and a bery bad idea at that.
+            // "bd" | "BD" | "Bd" | "bD" => {
+            //     if let Some(param) = parameter {
+            //         let r = efs.baptize_dir(param);
+
+            //         if !r {
+            //             return ("DirectoryNotFound <:bd>".to_string(), false);
+            //         }
+            //     }
+            // }
 
             "r" | "R" => {
                 if let Some(param) = parameter {

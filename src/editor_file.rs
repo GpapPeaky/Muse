@@ -200,8 +200,61 @@ impl EditorFileSystem {
       }
 
       fs::remove_dir_all(folder_name).is_ok()
+    }
 
-   }
+    /// Rename the current open file to fname
+    /// return true if complete, false if not
+    pub fn baptize_file(&mut self, fname: &str) -> bool {
+        let old_path = match &self.current_file {
+            Some(p) => p.clone(),
+            None => return false,
+        };
+
+        let mut new_path = old_path.clone();
+        new_path.set_file_name(fname);
+
+        if std::fs::rename(&old_path, &new_path).is_err() {
+            return false;
+        }
+
+        self.current_file = Some(new_path);
+
+        true
+    }
+
+
+    // /// Rename the current open file to folder
+    // /// return true if complete, false if not
+    // pub fn baptize_dir(&mut self, dname: &str) -> bool {
+    //     let old_path = match &self.current_dir {
+    //         Some(p) => p.clone(),
+    //         None => return false, // no current directory
+    //     };
+
+    //     if old_path.file_name()
+    //         .map(|n| n == dname)
+    //         .unwrap_or(false)
+    //     {
+    //         return true;
+    //     }
+
+    //     let mut new_path = old_path.clone();
+    //     new_path.set_file_name(dname);
+
+    //     if new_path.exists() {
+    //         return false; // cannot rename, target already exists
+    //     }
+
+    //     // Attempt rename
+    //     if std::fs::rename(&old_path, &new_path).is_err() {
+    //         return false; 
+    //     }
+
+    //     // Update internal reference
+    //     self.current_dir = Some(new_path);
+
+    //     true
+    // }
 }
 
 /// Get a path buffer as a string

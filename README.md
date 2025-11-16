@@ -1,4 +1,4 @@
-# Muse Code Text Editor (v1.3.1)
+# Muse Code Text Editor (v1.4.0)
 
 A lightweight console-based editor that allows users to manage files, directories, and editor configurations directly from a command-line interface. The editor supports switching between console mode and insert mode seamlessly, along with a wide range of file, directory, and editor management directives.
 
@@ -74,7 +74,6 @@ All console commands are prefixed with a `:`. Commands without `:` are treated a
 | `:od/:o` | Open the directory in the native file explorer. |
 | `:md <f>` | Create a new directory named `<f>`. |
 | `:rd <f>` | Remove a directory named `<f>` and all its contents. |
-| `:bd <f>` | Rename the current open directory to `<f>`. |
 
 ---
 
@@ -86,12 +85,8 @@ All configuration changes are saved in `cal.conf`.
 |-----------|-------------|
 | `:epa <p>` | Change the editor palette to `<p>`. |
 | `:efn <p>` | Change the editor font to `<p>`. |
-| `:efs <N>` | Change the font size to `N`. |
 | `:eau` | Toggle editor audio on/off. |
 | `:eav <N>` | Set editor audio volume to `N`. |
-| `:esi` | Toggle smart indentation on/off. |
-| `:efl` | Toggle editor fullscreen mode. |
-| `:ehi` | Toggle syntax highlighting. |
 
 ---
 
@@ -107,7 +102,6 @@ All configuration changes are saved in `cal.conf`.
 | `:eoman` | Display other editor directives manual. |
 | `:ectrl` | Display the editor infile controls manual. |
 | `:ever` | Display editor version. |
-| `:eck` | Display editor clock (current time and session time). |
 | `:egam/:rand/:roll <N>` | Display a random number between 0 and `N`. |
 
 ---

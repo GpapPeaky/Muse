@@ -148,7 +148,7 @@ fn calibrate_string_color(string: &str) -> Color {
 
 /// Record special key presses
 pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer, efs: &mut EditorFileSystem) -> bool {
-    if is_key_down(KeyCode::Backspace) {
+    if is_key_pressed(KeyCode::Backspace) {
         audio.play_delete();
         efs.unsaved_changes = true;
 
@@ -201,29 +201,66 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
         return true;
     }
 
-    if is_key_down(KeyCode::Tab) {
+    if is_key_pressed(KeyCode::Tab) {
         audio.play_space();
 
         let line = &mut text[cursor.xy.1];
         let byte_idx = char_to_byte(line, cursor.xy.0);
         line.insert_str(byte_idx, TAB_PATTERN);
+        
         cursor.xy.0 += TAB_SIZE;
 
         return true;
     }
 
-    if is_key_down(KeyCode::Enter) {
+    if is_key_pressed(KeyCode::Enter) {
         audio.play_return();
+        efs.unsaved_changes = true;
 
         let line = &mut text[cursor.xy.1];
-        let rest = line.split_off(char_to_byte(line, cursor.xy.0));
+        let cursor_pos = cursor.xy.0;
+
+        let rest = line.split_off(char_to_byte(line, cursor_pos));
+
+        let base_indent: String = line.chars()
+            .take_while(|c| c.is_whitespace())
+            .collect();
+
+        let closer_to_insert =
+            if cursor_pos > 0 && line.trim_end().ends_with('{') && rest.starts_with('}') {
+                Some('}')
+            } else if cursor_pos > 0 && line.trim_end().ends_with('(') && rest.starts_with(')') {
+                Some(')')
+            } else if cursor_pos > 0 && line.trim_end().ends_with('[') && rest.starts_with(']') {
+                Some(']')
+            } else {
+                None
+            };
+
+        let mut new_line = base_indent.clone();
+        if line.trim_end().ends_with('{')
+            || line.trim_end().ends_with('(')
+            || line.trim_end().ends_with('[')
+        {
+            new_line.push_str(TAB_PATTERN);
+        }
+
         cursor.xy.1 += 1;
+        cursor.xy.0 = new_line.chars().count();
+        text.insert(cursor.xy.1, new_line);
 
-        cursor.xy.0 = 0;
-        
-        text.insert(cursor.xy.1, rest);
+        if let Some(closer) = closer_to_insert {
+            let mut cleaned_rest = rest.clone();
+            cleaned_rest.remove(0);
 
-        efs.unsaved_changes = true;
+            text[cursor.xy.1 - 1].push_str(&cleaned_rest);
+
+            text.insert(cursor.xy.1 + 1, format!("{}{}", base_indent, closer));
+        } else {
+            if !rest.is_empty() {
+                text.insert(cursor.xy.1 + 1, rest);
+            }
+        }
 
         return true;
     }

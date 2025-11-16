@@ -25,7 +25,6 @@ use editor_pallete::*;
 
 // FIXME: Directories split with spaces do not work.
 // TODO: Add :cd autocomplete with TAB
-// TODO: Add smarter identation
 // TODO: Finish all the directives
 // TODO: Add Ctrl + x shortcut to cut line
 // TODO: Add Ctrl + s shortcut to quickly save the file
@@ -40,7 +39,7 @@ use editor_pallete::*;
 
 // IDEA: Add a cmd/terminal wrapper maybe, for compiling/executing code and other commands.
 
-pub const VERSION: &str = "Muse-V1.3.1";
+pub const VERSION: &str = "Muse-v01.04.00";
 
 /// Window configuration
 fn window_conf() -> Conf {
@@ -51,7 +50,7 @@ fn window_conf() -> Conf {
     };
 
     Conf {
-        window_title: VERSION.to_string(),
+        window_title: "muse".to_string(),
         icon: Some(icon),
         ..Default::default()
     }
