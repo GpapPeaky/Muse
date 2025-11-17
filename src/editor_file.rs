@@ -222,7 +222,6 @@ impl EditorFileSystem {
         true
     }
 
-
     // /// Rename the current open file to folder
     // /// return true if complete, false if not
     // pub fn baptize_dir(&mut self, dname: &str) -> bool {

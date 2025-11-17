@@ -24,6 +24,10 @@ mod editor_cursor;
 mod editor_pallete;
 use editor_pallete::*;
 
+#[path = "editor_keywords.rs"]
+mod editor_keywords;
+use editor_keywords::*;
+
 pub struct EditorGeneralTextStylizer {
     pub font: Font,
     pub font_size: u16,
@@ -58,66 +62,6 @@ pub const FILE_TEXT_X_MARGIN: f32 = 50.0;
 pub const FILE_TEXT_Y_MARGIN: f32 = 80.0;
 const TAB_SIZE: usize = 4;
 const TAB_PATTERN: &str = "    ";
-
-
-const CONTROL_FLOW_STATEMENTS: [&str; 46] = [
-    "if", "else", "switch", "case", "default",
-    "for", "while", "do", "break", "continue",
-    "goto", "return", "try", "catch", "finally",
-    "throw", "throws", "loop", "match", "yield",
-    "await", "async", "then", "except", "raise",
-    "elif", "when", "until", "unless", "foreach",
-    "in", "from", "select", "where", "defer",
-    "guard", "assert", "panic", "recover",
-    "next", "redo", "exit", "abort", "with",
-    "elif", "end",
-];
-
-const STORAGE_CLASS_SPECIFIERS: [&str; 18] = [
-    "auto", "static", "extern", "register", "typedef",
-    "mutable", "constexpr", "thread_local", "let", "var",
-    "const", "final", "override", "sealed", "lazy",
-    "owned", "borrowed", "inline",
-];
-
-const TYPE_QUALIFIERS: [&str; 14] = [
-    "const", "volatile", "restrict", "constexpr",
-    "ref", "mut", "transient", "synchronized",
-    "abstract", "readonly", "immutable", "dynamic",
-    "weak", "unsafe",
-];
-
-const COMPOSITE_TYPES: [&str; 12] = [
-    "struct", "union", "enum", "class", "trait",
-    "interface", "protocol", "record", "object",
-    "impl", "concept", "module",
-];
-
-const MISC: [&str; 39] = [
-    "sizeof", "inline", "virtual", "explicit", "namespace",
-    "using", "operator", "template", "typename", "friend",
-    "crate", "super", "self", "import", "package",
-    "include", "public", "private", "protected", "internal",
-    "static_cast", "reinterpret_cast", "dynamic_cast", "const_cast",
-    "typeof", "instanceof", "new", "delete", "clone",
-    "as", "is", "extends", "implements", "default",
-    "partial", "module", "export", "require", "use",
-];
-
-const DATA_TYPES: [&str; 60] = [
-    "int", "float", "double", "char", "void",
-    "short", "long", "signed", "unsigned", "bool",
-    "boolean", "byte", "wchar_t", "auto", "decltype",
-    "nullptr_t", "String", "str", "u8", "u16",
-    "u32", "u64", "u128", "i8", "i16", "i32",
-    "i64", "i128", "f32", "f64", "usize", "isize",
-    "any", "object", "None", "null", "undefined",
-    "map", "list", "array", "tuple", "set", "dict",
-    "Vec", "Option", "Result", "number", "char8_t",
-    "char16_t", "char32_t", "interface", "record", "trait",
-    "enum", "struct", "unit", "string", "symbol",
-    "function", "object",
-];
 
 /// Convert a provided character index to the actual byte
 /// the character is at. Allows for UTF-8 characters
@@ -470,7 +414,7 @@ pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<St
 }
 
 /// All around draw function for the editor text
-pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut EditorGeneralTextStylizer, console: &EditorConsole, camera: &mut crate::editor_camera::EditorCamera) {
+pub fn draw(text: &Vec<String>, cursor: &mut EditorCursor, gts: &mut EditorGeneralTextStylizer, console: &EditorConsole, camera: &mut crate::editor_camera::EditorCamera) {
     if text.is_empty() {
         return;
     }
@@ -488,16 +432,16 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     let cam_bottom = camera.offset_y + screen_height();
 
     // Draw cursor
-    if !console.mode && cursor_y < text.len() {
-        let line = &text[cursor_y];
-        let byte_idx = char_to_byte(line, cursor_x);
+    if !console.mode && cursor.xy.1 < text.len() {
+        let line = &text[cursor.xy.1];
+        let byte_idx = char_to_byte(line, cursor.xy.0);
         let prefix = &line[..byte_idx];
     
         let visual_prefix = prefix.replace("\t", TAB_PATTERN);
         let text_before_cursor = measure_text(&visual_prefix, Some(&gts.font), gts.font_size, 1.0);
     
         let cursor_x_pos = start_x + line_start_fix + text_before_cursor.width;
-        let cursor_y_pos = start_y + cursor_y as f32 * line_spacing + text_y_offset;
+        let cursor_y_pos = start_y + cursor.xy.1 as f32 * line_spacing + text_y_offset;
     
         camera.follow_cursor(cursor_x_pos, cursor_y_pos);
     
@@ -636,7 +580,7 @@ pub fn draw(text: &Vec<String>, cursor_x: usize, cursor_y: usize, gts: &mut Edit
     draw_rectangle(0.0, 0.0, screen_width(), top_bar_height, BACKGROUND_COLOR);
 
     // Draw cursor position
-    let cursor_idx = format!("Ln {}, Col {}", cursor_y, cursor_x);
+    let cursor_idx = format!("Ln {}, Col {}", cursor.xy.1, cursor.xy.0);
     draw_text(&cursor_idx, MODE_Y_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + MODE_Y_OFFSET, MODE_FONT_SIZE, CONSOLE_TEXT_COLOR);
 
     // Console draw

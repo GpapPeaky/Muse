@@ -79,7 +79,7 @@ async fn main() {
     loop {
         clear_background(BACKGROUND_COLOR);
 
-        draw(&mut file_text, file_cursor.xy.0, file_cursor.xy.1, &mut gts, &console, &mut ec);
+        draw(&mut file_text, &mut file_cursor, &mut gts, &console, &mut ec);
         if console.mode {
             let autocomplete = draw_dir_contents(&efs.current_file, &efs.current_dir, console.directive.to_string());
             
