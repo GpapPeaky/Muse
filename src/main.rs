@@ -78,6 +78,8 @@ async fn main() {
 
         draw_file_text(&mut file_text, &mut file_cursor, &mut gts, &console, &mut ec);
         if console.mode {
+            console.draw();
+
             let autocomplete = draw_dir_contents(&efs.current_file, &efs.current_dir, console.directive.to_string());
             
             if autocomplete != "" {
@@ -108,9 +110,6 @@ async fn main() {
             draw_text("CONSOLE MODE", MODE_Y_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, COMPOSITE_TYPE_COLOR,);
             draw_text(&path_buffer_to_string(&efs.current_dir), console_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, FOLDER_COLOR);
             draw_text(&fname, console_word_w + CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, FILE_COLOR);
-
-            // Console draw
-            console.draw();
         }
 
         // Show message

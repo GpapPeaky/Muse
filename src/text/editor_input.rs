@@ -150,7 +150,14 @@ fn lctrl_shortcuts(
 }
 
 /// Record special key presses
-pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio, console: &mut EditorConsole, gts: &mut EditorGeneralTextStylizer, efs: &mut EditorFileSystem) -> bool {
+pub fn record_special_keys(
+    cursor: &mut EditorCursor,
+    text: &mut Vec<String>,
+    audio: &EditorAudio,
+    console: &mut EditorConsole,
+    gts: &mut EditorGeneralTextStylizer,
+    efs: &mut EditorFileSystem
+) -> bool {
     // Backspace
     if is_key_pressed(KeyCode::Backspace) {
         audio.play_delete();
@@ -222,55 +229,49 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
     if is_key_pressed(KeyCode::Enter) {
         audio.play_return();
         efs.unsaved_changes = true;
-
+    
         let line = &mut text[cursor.xy.1];
         let cursor_pos = cursor.xy.0;
-
-        let rest = line.split_off(char_to_byte(line, cursor_pos));
-
-        let base_indent: String = line.chars()
-            .take_while(|c| c.is_whitespace())
-            .collect();
-
-        let closer_to_insert =
-            if cursor_pos > 0 && line.trim_end().ends_with('{') && rest.starts_with('}') {
-                Some('}')
-            } else if cursor_pos > 0 && line.trim_end().ends_with('(') && rest.starts_with(')') {
-                Some(')')
-            } else if cursor_pos > 0 && line.trim_end().ends_with('[') && rest.starts_with(']') {
-                Some(']')
-            } else {
-                None
-            };
-
+    
+        // Split the line at cursor
+        let rest_of_line = line.split_off(char_to_byte(line, cursor_pos));
+    
+        // Get base indentation (spaces/tabs at start of line)
+        let base_indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
+    
+        // Determine if we should increase indent
+        let increase_indent = matches!(line.trim_end().chars().last(), Some('{') | Some('(') | Some('['));
+    
+        // Determine if we need to insert a closer
+        let next_closer = match (line.trim_end().chars().last(), rest_of_line.chars().next()) {
+            (Some('{'), Some('}')) => Some('}'),
+            (Some('('), Some(')')) => Some(')'),
+            (Some('['), Some(']')) => Some(']'),
+            _ => None,
+        };
+    
+        // Prepare new line indentation
         let mut new_line = base_indent.clone();
-        if line.trim_end().ends_with('{')
-            || line.trim_end().ends_with('(')
-            || line.trim_end().ends_with('[')
-        {
+        if increase_indent {
             new_line.push_str(TAB_PATTERN);
         }
-
+    
+        // Insert new line
         cursor.xy.1 += 1;
         cursor.xy.0 = new_line.chars().count();
         text.insert(cursor.xy.1, new_line);
-
-        if let Some(closer) = closer_to_insert {
-            let mut cleaned_rest = rest.clone();
-            cleaned_rest.remove(0);
-
-            text[cursor.xy.1 - 1].push_str(&cleaned_rest);
-
-            text.insert(cursor.xy.1 + 1, format!("{}{}", base_indent, closer));
-        } else {
-            if !rest.is_empty() {
-                text.insert(cursor.xy.1 + 1, rest);
-            }
-        }
-
-        return true;
-    }
     
+        // If there’s a closer, handle it smartly
+        if let Some(closer) = next_closer {
+            // Remove the closer from rest_of_line
+            let rest_cleaned = rest_of_line[closer.len_utf8()..].to_string();
+            text[cursor.xy.1 - 1].push_str(&rest_cleaned); // append rest to previous line
+            text.insert(cursor.xy.1 + 1, format!("{}{}", base_indent, closer)); // insert closer on new line
+        } else if !rest_of_line.is_empty() {
+            text.insert(cursor.xy.1 + 1, rest_of_line);
+        }
+    }
+        
     if !lctrl_shortcuts(cursor, text, audio, console, efs, gts) {
         file_text_navigation(cursor, text, audio);
     }
@@ -304,12 +305,6 @@ pub fn record_keyboard_to_file_text(cursor: &mut EditorCursor, text: &mut Vec<St
             text.push(String::new());
         }
         match c {
-            // '\u{8}' | '\r' | '\n' | '\t' => {
-            //     // We also have to pre-terminate with these special characters,
-            //     // since input is passed in a queue
-            //     return; // Special characters will be handled elsewhere
-            // }
-
             '<' => {
                 audio.play_insert();
 
