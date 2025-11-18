@@ -236,6 +236,38 @@ pub fn record_special_keys(cursor: &mut EditorCursor, text: &mut Vec<String>, au
             console.mode = true; // Opens the console with the cursor right on where it needs to be
             console.cursor.x = console.directive.len();
         }
+
+        // Open native file explorer        
+        if is_key_pressed(KeyCode::O) {
+            console.directive = ":O".to_string();
+            execute_directive(&mut console.directive, efs, text, cursor);
+        }
+        
+        // Create a new file
+        if is_key_pressed(KeyCode::N) {
+            console.directive = ":c f".to_string();
+            execute_directive(&mut console.directive, efs, text, cursor);
+        }
+        
+        // 'Baptize' current file
+        if is_key_pressed(KeyCode::B) {
+            console.directive = ":b ".to_string();
+            console.mode = true;
+            console.cursor.x = console.directive.len();
+        }
+        
+        // Remove current file
+        if is_key_pressed(KeyCode::R) {
+            console.directive = ":r".to_string();
+            execute_directive(&mut console.directive, efs, text, cursor);
+        }
+        
+        // Create directory
+        if is_key_pressed(KeyCode::M) {
+            console.directive = ":md ".to_string();
+            console.mode = true;
+            console.cursor.x = console.directive.len();
+        }
     }
 
     // More special keys
