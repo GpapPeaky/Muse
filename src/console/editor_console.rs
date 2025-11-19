@@ -85,7 +85,13 @@ impl EditorConsole {
     }
 
     /// Special input, backspace and enter
-    fn record_special_console_keys(&mut self, audio: &EditorAudio, efs: &mut EditorFileSystem, text: &mut Vec<String>, cursor: &mut EditorCursor) {
+    fn record_special_console_keys(
+        &mut self,
+        audio: &EditorAudio,
+        efs: &mut EditorFileSystem,
+        text: &mut Vec<String>,
+        cursor: &mut EditorCursor
+    ) {
         if is_key_pressed(KeyCode::Backspace) {
             if self.cursor.x > 0 && !self.directive.is_empty() {
                 let mut byte_idx = char_to_byte(&self.directive, self.cursor.x - 1);
@@ -111,8 +117,6 @@ impl EditorConsole {
             if is_key_pressed(KeyCode::GraveAccent) {
                 self.mode = false;
             }
-
-            console_text_special_navigation(&mut self.cursor.x, &mut self.directive, audio);
         }
 
         if is_key_pressed(KeyCode::Enter) {
@@ -132,7 +136,13 @@ impl EditorConsole {
     }
 
     /// Record  heyboard input
-    pub fn record_keyboard_to_console_text(&mut self, audio: &EditorAudio, efs: &mut EditorFileSystem, text: &mut Vec<String>, cursor: &mut EditorCursor) {
+    pub fn record_keyboard_to_console_text(
+        &mut self,
+        audio: &EditorAudio,
+        efs: &mut EditorFileSystem,
+        text: &mut Vec<String>,
+        cursor: &mut EditorCursor
+    ) {
         self.record_special_console_keys(audio, efs, text, cursor);
 
         // Disable special characters from the console.
@@ -155,11 +165,18 @@ impl EditorConsole {
                 }
             }
         }
+
+        console_text_navigation(&mut self.cursor.x, &mut self.directive, audio);
     }
 }
 
 /// Draws multi-line text
-pub fn draw_multiline_text_centered(text: &str, font_size: u16, color: Color, start_y: f32) {
+pub fn draw_multiline_text_centered(
+    text: &str,
+    font_size: u16,
+    color: Color,
+    start_y: f32
+) {
     let line_height = font_size as f32 + 5.0; // 5px padding between lines
     let mut y = start_y;
 
@@ -177,7 +194,10 @@ pub fn draw_multiline_text_centered(text: &str, font_size: u16, color: Color, st
 }
 
 /// Show a message error produced by the console
-pub fn console_message(msg: &String, is_manual: bool) {
+pub fn console_message(
+    msg: &String, 
+    is_manual: bool
+) {
     let msg_font_size = 18;
     let text_width = measure_text(&msg, None, msg_font_size, 1.0).width;    
     

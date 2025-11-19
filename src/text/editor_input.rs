@@ -76,7 +76,10 @@ fn lctrl_shortcuts(
         if is_key_pressed(KeyCode::N) {
             console.directive = ":c f".to_string();
             execute_directive(&mut console.directive, efs, text, cursor);
-
+            console.directive = ":b ".to_string();
+            console.mode = true;
+            console.cursor.x = console.directive.len();
+        
             return true;
         }
         

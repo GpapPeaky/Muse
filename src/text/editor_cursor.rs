@@ -10,7 +10,6 @@ pub struct EditorCursor {
 }
 
 impl EditorCursor {
-    #[allow(dead_code)]
     pub fn new() -> EditorCursor {
         EditorCursor {
             xy: (0, 0),
@@ -19,7 +18,11 @@ impl EditorCursor {
 }
 
 /// Standard cursor navigation
-pub fn file_text_navigation(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio) {
+pub fn file_text_navigation(
+    cursor: &mut EditorCursor, 
+    text: &mut Vec<String>, 
+    audio: &EditorAudio
+) {
     if text.is_empty() {
         cursor.xy.0 = 0;
         cursor.xy.1 = 0;
@@ -70,7 +73,11 @@ pub fn file_text_navigation(cursor: &mut EditorCursor, text: &mut Vec<String>, a
 }
 
 /// Special navigation with LCTRL movement
-pub fn file_text_special_navigation(cursor: &mut EditorCursor, text: &mut Vec<String>, audio: &EditorAudio) {
+pub fn file_text_special_navigation(
+    cursor: &mut EditorCursor, 
+    text: &mut Vec<String>, 
+    audio: &EditorAudio
+) {
     if text.is_empty() {
         cursor.xy.0 = 0;
         cursor.xy.1 = 0;
@@ -156,7 +163,11 @@ pub fn file_text_special_navigation(cursor: &mut EditorCursor, text: &mut Vec<St
 
 /// Calculate the distance from the left or right of a whitespace if the cursor is inside text
 /// or a character if the cursor is inside whitespace
-pub fn calibrate_distance_to_whitespace_or_character(leftorright: bool, cursor_idx: usize, line: &str) -> usize {
+pub fn calibrate_distance_to_whitespace_or_character(
+    leftorright: bool, 
+    cursor_idx: usize, 
+    line: &str
+) -> usize {
     let chars: Vec<char> = line.chars().collect();
     let len = chars.len();
     if len == 0 {

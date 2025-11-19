@@ -57,6 +57,7 @@ use crate::console::editor_console::*;
 use crate::console::editor_file::*;
 use crate::text::editor_cursor::*;
 use crate::VERSION;
+use crate::text::editor_text::find_word_in_text;
 
 /// Check if there is a ':', trim it, match it to a directive and execute it
 /// else we will see it as switch-to-file operation
@@ -103,7 +104,7 @@ pub fn execute_directive(
             "f" | "F" => {
                 if let Some(param) = parameter {                
                     // FIXME
-                    let r = find_word_in_text(&text, cursor);
+                    let r = find_word_in_text(param, &text, cursor);
                     
                     if !r {
                         return ("IdentifierNotFound <:f>".to_string(), false);

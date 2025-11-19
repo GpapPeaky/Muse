@@ -14,7 +14,7 @@ use crate::text::editor_input::*;
 use crate::text::editor_text_stylizer::*;
 use crate::camera::editor_camera::*;
 
-pub const CURRENT_FILE_TOP_BAR_OFFSET: f32 = 50.0;
+pub const CURRENT_FILE_TOP_BAR_OFFSET: f32 = 100.0;
 
 pub const MODE_FONT_SIZE: f32 = 30.0;
 pub const MODE_Y_MARGIN: f32 = 10.0;
@@ -25,6 +25,21 @@ pub const FILE_LINE_NUMBER_Y_MARGIN: f32 = 26.0;
 
 pub const FILE_TEXT_X_MARGIN: f32 = 50.0;
 pub const FILE_TEXT_Y_MARGIN: f32 = 80.0;
+
+/// Find a word in the text 
+/// and move the cursor there
+/// return true if found, false if not
+pub fn find_word_in_text(word: &str, text: &Vec<String>, cursor: &mut EditorCursor) -> bool {
+    for i in 0..text.len() {
+        if text[i].contains(word) {
+            cursor.xy.1 = i;
+
+            return true;
+        }
+    }
+
+    false
+}
 
 /// All around draw function for the editor text
 pub fn draw_file_text(text: &Vec<String>, cursor: &mut EditorCursor, gts: &mut EditorGeneralTextStylizer, console: &EditorConsole, camera: &mut EditorCamera) {
