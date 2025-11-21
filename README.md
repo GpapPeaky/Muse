@@ -27,8 +27,8 @@ A lightweight console-based editor that allows users to manage files, directorie
 
 The editor has two main modes:
 
-- **Console Mode** – Execute directives, switch files/directories, manage configurations.
-- **Insert Mode** – Edit file content.
+- **Console Mode** - Execute directives, switch files/directories, manage configurations.
+- **Insert Mode** - Edit file content, current cursor line/column and word are dispayed in the top bar
 
 Switch between modes by pressing: *LCtrl + `*
 
