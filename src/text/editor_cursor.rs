@@ -161,6 +161,59 @@ pub fn file_text_special_navigation(
     }
 }
 
+/// Calculate the distance from the left or right 
+/// to a whitepsace based on the cursor's position
+/// return the distance
+pub fn calibrate_distance_to_whitespace(
+    leftorright: bool,
+    cursor_idx: usize,
+    line: &str,    
+) -> usize {
+    let chars: Vec<char> = line.chars().collect();
+    let len = chars.len();
+    if len == 0 {
+        return 0;
+    }
+    
+    let mut cursor = cursor_idx.min(len);
+    let mut steps = 0;
+    
+    // True right, false left
+    if leftorright {
+        if cursor >= len {
+            return 0;
+        }
+        
+        for i in cursor..len {
+            if chars[i] == ' ' {
+                break;
+            }
+            
+            steps += 1;
+        }
+        
+        return steps;
+    } else {
+        if cursor == 0 {
+            return 0;
+        }
+        
+        cursor -= 1;
+        
+        while cursor > 0 {
+            if chars[cursor - 1] == ' ' {
+                break;
+            }
+            
+            cursor -= 1;
+            steps += 1;
+        }
+         
+        steps + 1
+    }
+    
+}
+
 /// Calculate the distance from the left or right of a whitespace if the cursor is inside text
 /// or a character if the cursor is inside whitespace
 pub fn calibrate_distance_to_whitespace_or_character(

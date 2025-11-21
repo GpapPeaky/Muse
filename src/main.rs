@@ -18,10 +18,10 @@ use crate::options::editor_options::EditorOptions;
 use crate::options::editor_pallete::{BACKGROUND_COLOR, COMPOSITE_TYPE_COLOR, FILE_COLOR, FOLDER_COLOR};
 use crate::text::editor_cursor::EditorCursor;
 use crate::text::editor_input::record_keyboard_to_file_text;
+use crate::text::editor_language_manager::{EditorLanguageKeywords ,load_keywords_for_extension};
 use crate::text::editor_text::{CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE, MODE_Y_MARGIN, MODE_Y_OFFSET, draw_file_text};
 use crate::text::editor_text_stylizer::EditorGeneralTextStylizer;
 
-// FIXME: Directories split with spaces do not work.
 // FIXME: Smart identation is problematic
 // TODO: Finish all the directives
 // TODO: Add Ctrl + z to undo last change
@@ -30,6 +30,8 @@ use crate::text::editor_text_stylizer::EditorGeneralTextStylizer;
 // TODO: Add Ctrl + v to paste copied text
 // TODO: Add the palletes
 
+// IDEA: Add a list of user defined functions to make it easier to traverse files
+// IDEA: Add a list of user defined identifiers that will pop up as an autocomplete thing
 // IDEA: Add a cmd/terminal wrapper maybe, for compiling/executing code and other commands.
 
 pub const VERSION: &str = "Muse-v01.05.00";
@@ -70,6 +72,8 @@ async fn main() {
     let mut console = EditorConsole::new();
     // Actual file text
     let mut file_text = vec![];
+    // Language support based on file
+    let mut elk: EditorLanguageKeywords = load_keywords_for_extension("txt"); 
 
     let insert_word_w = measure_text("INSERT MODE", None, MODE_FONT_SIZE as u16, 1.0).width;
     let console_word_w = measure_text("CONSOLE MODE", None, MODE_FONT_SIZE as u16, 1.0).width;
@@ -77,7 +81,7 @@ async fn main() {
     loop {
         clear_background(BACKGROUND_COLOR);
 
-        draw_file_text(&mut file_text, &mut file_cursor, &mut gts, &console, &mut ec);
+        draw_file_text(&mut file_text, &mut file_cursor, &mut gts, &console, &mut ec, &elk);
         if console.mode {
             console.draw();
         
@@ -100,7 +104,7 @@ async fn main() {
         }
 
         if !console.mode {
-            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts, &mut efs, &mut ops);
+            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts, &mut efs, &mut ops, &mut elk);
 
             let mut fname = path_buffer_file_to_string(&efs.current_file);
             if efs.unsaved_changes {
@@ -111,7 +115,7 @@ async fn main() {
             draw_text(&path_buffer_to_string(&efs.current_dir), insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0, MODE_FONT_SIZE, FOLDER_COLOR);
             draw_text(&fname, insert_word_w + CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, FILE_COLOR);
         } else {
-            console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text, &mut file_cursor, &mut ops);
+            console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text, &mut file_cursor, &mut ops, &mut elk);
             
             let mut fname = path_buffer_file_to_string(&efs.current_file);
             if efs.unsaved_changes {

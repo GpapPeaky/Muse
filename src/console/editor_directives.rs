@@ -49,6 +49,7 @@
 // Pressing TAB will select the first seen file closest to the name given and autocomplete it
 // in the console.
 
+use std::path::Path;
 use std::str::FromStr;
 
 use macroquad::prelude::rand;
@@ -58,6 +59,8 @@ use crate::console::editor_console::*;
 use crate::console::editor_file::*;
 use crate::text::editor_cursor::*;
 use crate::VERSION;
+use crate::text::editor_language_manager::EditorLanguageKeywords;
+use crate::text::editor_language_manager::load_keywords_for_extension;
 use crate::text::editor_text::find_word_in_text;
 
 /// Check if there is a ':', trim it, match it to a directive and execute it
@@ -70,6 +73,7 @@ pub fn execute_directive(
     text: &mut Vec<String>, 
     cursor: &mut EditorCursor,
     ops: &mut EditorOptions,
+    elk: &mut EditorLanguageKeywords
 ) -> (String, bool) {
     if directive.starts_with(':') {
         let directive_command = directive.trim_start_matches(':').trim();
@@ -250,6 +254,16 @@ pub fn execute_directive(
         if efs.change_current_file(directive.to_string()) {
             text.clear();
             *text = efs.load_current_file().unwrap_or_default();
+
+            let fname = path_buffer_file_to_string(&efs.current_file);
+
+            let ext = Path::new(&fname)
+                .extension()
+                .and_then(|e| e.to_str())
+                .unwrap_or("");
+
+            // Load the new language support
+            *elk = load_keywords_for_extension(ext);
         } else {
             text.clear();
             efs.current_file = None;

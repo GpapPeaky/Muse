@@ -16,6 +16,7 @@ use crate::console::editor_console_cursor::*;
 use crate::console::editor_file::*;
 use crate::text::editor_cursor::*;
 use crate::console::editor_directives::*;
+use crate::text::editor_language_manager::EditorLanguageKeywords;
 
 pub struct EditorConsole {
     pub mode: bool,
@@ -94,7 +95,8 @@ impl EditorConsole {
         efs: &mut EditorFileSystem,
         text: &mut Vec<String>,
         cursor: &mut EditorCursor,
-        ops: &mut EditorOptions
+        ops: &mut EditorOptions,
+        elk: &mut EditorLanguageKeywords
     ) {
         if is_key_pressed(KeyCode::Backspace) {
             if self.cursor.x > 0 && !self.directive.is_empty() {
@@ -126,7 +128,7 @@ impl EditorConsole {
         if is_key_pressed(KeyCode::Enter) {
             // execute whatever is inside the directive string
             // check the directives' source
-            let message_and_manual_toggle = execute_directive(&mut self.directive, efs, text, cursor, ops).clone();
+            let message_and_manual_toggle = execute_directive(&mut self.directive, efs, text, cursor, ops, elk).clone();
 
             // Update for rendering.
             self.message = message_and_manual_toggle.0;
@@ -146,9 +148,10 @@ impl EditorConsole {
         efs: &mut EditorFileSystem,
         text: &mut Vec<String>,
         cursor: &mut EditorCursor,
-        ops: &mut EditorOptions
+        ops: &mut EditorOptions,
+        elk: &mut EditorLanguageKeywords
     ) {
-        self.record_special_console_keys(audio, efs, text, cursor, ops);
+        self.record_special_console_keys(audio, efs, text, cursor, ops, elk);
 
         // Disable special characters from the console.
         if let Some(c) = get_char_pressed() {

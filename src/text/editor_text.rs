@@ -11,6 +11,7 @@ use crate::console::editor_console::*;
 use crate::options::editor_pallete::*;
 use crate::text::editor_cursor::*;
 use crate::text::editor_input::*;
+use crate::text::editor_language_manager::EditorLanguageKeywords;
 use crate::text::editor_text_stylizer::*;
 use crate::camera::editor_camera::*;
 
@@ -48,7 +49,8 @@ pub fn draw_file_text(
     cursor: &mut EditorCursor,
     gts: &mut EditorGeneralTextStylizer,
     console: &EditorConsole,
-    camera: &mut EditorCamera
+    camera: &mut EditorCamera,
+    elk: &EditorLanguageKeywords
 ) {
     if text.is_empty() {
         return;
@@ -183,7 +185,7 @@ pub fn draw_file_text(
                             token.push(chars.next().unwrap());
                         }
                         let clean = token.trim_matches(|c: char| !c.is_alphanumeric() && c != '_');
-                        color = gts.calibrate_string_color(clean);
+                        color = gts.calibrate_string_color(clean, &elk);
                     }
                 }
             }

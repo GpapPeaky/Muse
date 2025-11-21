@@ -2,6 +2,7 @@
 
 use macroquad::prelude::*;
 use crate::options::editor_options::EditorOptions;
+use crate::text::editor_language_manager::EditorLanguageKeywords;
 use crate::text::editor_text_stylizer::*;
 use crate::text::editor_cursor::*;
 
@@ -32,7 +33,8 @@ fn lctrl_shortcuts(
     console: &mut EditorConsole,
     efs: &mut EditorFileSystem,
     gts: &mut EditorGeneralTextStylizer,
-    ops: &mut EditorOptions
+    ops: &mut EditorOptions,
+    elk: &mut EditorLanguageKeywords
 ) -> bool {
     // Left control shorcuts
     if is_key_down(KeyCode::LeftControl) {
@@ -52,7 +54,7 @@ fn lctrl_shortcuts(
         // Save/write to file
         if is_key_pressed(KeyCode::S) {
             console.directive = ":w".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops);
+            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
 
             return true;
         }
@@ -70,7 +72,7 @@ fn lctrl_shortcuts(
         // Open native file explorer        
         if is_key_pressed(KeyCode::O) {
             console.directive = ":O".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops);
+            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
 
             return true;
         }
@@ -78,7 +80,7 @@ fn lctrl_shortcuts(
         // Create a new file
         if is_key_pressed(KeyCode::N) {
             console.directive = ":c f".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops);
+            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
             console.directive = ":b ".to_string();
             console.mode = true;
             console.cursor.x = console.directive.len();
@@ -98,7 +100,7 @@ fn lctrl_shortcuts(
         // Remove current file
         if is_key_pressed(KeyCode::R) {
             console.directive = ":r".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops);
+            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
 
             return true;
         }
@@ -129,8 +131,8 @@ fn lctrl_shortcuts(
             // from the word_idx
 
             let cursor_idx = cursor.xy.0;
-            let left_distance = calibrate_distance_to_whitespace_or_character(false, cursor_idx, &text[cursor.xy.1]);
-            let right_distance = calibrate_distance_to_whitespace_or_character(true, cursor_idx, &text[cursor.xy.1]);
+            let left_distance = calibrate_distance_to_whitespace(false, cursor_idx, &text[cursor.xy.1]);
+            let right_distance = calibrate_distance_to_whitespace(true, cursor_idx, &text[cursor.xy.1]);
             
             // Index of where the word starts
             let left_cursor_idx = cursor_idx - left_distance;
@@ -156,15 +158,15 @@ fn lctrl_shortcuts(
         // Save and quit
         if is_key_pressed(KeyCode::Q) {
             console.directive = ":W".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops);
+            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
             console.directive = ":q".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops);
+            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
         }
         
         // Quit
         if is_key_pressed(KeyCode::E) {
             console.directive = ":e".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops);
+            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
         }
 
         // Console switch
@@ -208,7 +210,8 @@ pub fn record_special_keys(
     console: &mut EditorConsole,
     gts: &mut EditorGeneralTextStylizer,
     efs: &mut EditorFileSystem,
-    ops: &mut EditorOptions
+    ops: &mut EditorOptions,
+    elk: &mut EditorLanguageKeywords
 ) -> bool {
     // Backspace
     if is_key_pressed(KeyCode::Backspace) {
@@ -324,7 +327,7 @@ pub fn record_special_keys(
         }
     }
         
-    if !lctrl_shortcuts(cursor, text, audio, console, efs, gts, ops) {
+    if !lctrl_shortcuts(cursor, text, audio, console, efs, gts, ops, elk) {
         file_text_navigation(cursor, text, audio);
     }
 
@@ -339,7 +342,8 @@ pub fn record_keyboard_to_file_text(
     console: &mut EditorConsole,
     gts: &mut EditorGeneralTextStylizer,
     efs: &mut EditorFileSystem,
-    ops: &mut EditorOptions
+    ops: &mut EditorOptions,
+    elk: &mut EditorLanguageKeywords
 ) {
     // let c = get_char_pressed().unwrap(); // Unwrap removes the Result/Option wrapper.
 
@@ -347,7 +351,7 @@ pub fn record_keyboard_to_file_text(
         text.push(String::new());
     }
 
-    if record_special_keys(cursor, text, audio, console, gts, efs, ops) {
+    if record_special_keys(cursor, text, audio, console, gts, efs, ops, elk) {
         return; // Handle the special key and terminate the call, as to 
         // not record any special escape character
     }
