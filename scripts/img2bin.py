@@ -6,7 +6,7 @@ input_folder = "assets/icon/"
 output_folder = "assets/icon/"
 
 for size in icon_sizes:
-    input_path = os.path.join(input_folder, f"muse.bmp")
+    input_path = os.path.join(input_folder, f"muse.png")
     output_path = os.path.join(output_folder, f"muse{size}.bin")
 
     # Open and resize the image (ensure correct size)
