@@ -1,4 +1,4 @@
-# Muse Code Text Editor (v1.5.0)
+# Muse Code Text Editor (v1.5.1)
 
 A lightweight console-based editor that allows users to manage files, directories, and editor configurations directly from a command-line interface. The editor supports switching between console mode and insert mode seamlessly, along with a wide range of file, directory, and editor management directives.
 
@@ -145,7 +145,7 @@ All configuration changes are saved in `cal.conf`.
 | **LCtrl + `=`**                | Increase editor font size.                                   |
 | **LCtrl + ArrowKeys**          | Move cursor 5 steps.                                         |
 | **LCtrl + LShift + ArrowKeys** | Hold to continuously move cursor (1 step per tick).          |
-| **LAlt + Up/Down**             | Move line at cursor by one.                                  |
+| **LShift + Up/Down**           | Move line at cursor by one.                                  |
 ---
 
 ## License

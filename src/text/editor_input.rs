@@ -1,6 +1,7 @@
 // Text input module
 
 use macroquad::prelude::*;
+
 use crate::options::editor_options::EditorOptions;
 use crate::text::editor_language_manager::EditorLanguageKeywords;
 use crate::text::editor_text_stylizer::*;
@@ -14,58 +15,47 @@ use crate::console::editor_directives::*;
 pub const TAB_SIZE: usize = 4;
 pub const TAB_PATTERN: &str = "    ";
 
-/// Convert a provided character index to the actual byte
-/// the character is at. Allows for UTF-8 characters
-/// and not only ASCII
-pub fn char_to_byte(
-    line: &str,
-    char_idx: usize
-) -> usize {
-    // We use UTF-8 so we need to count bytes NOT characters like C.
+/// Convert character index to byte index for UTF-8 strings
+pub fn char_to_byte(line: &str, char_idx: usize) -> usize {
     line.char_indices().nth(char_idx).map(|(b, _)| b).unwrap_or(line.len())
 }
 
-/// Left alt shortcuts
-fn lalt_shortcuts(
+fn lshift_shortcuts(
     cursor: &mut EditorCursor,
     text: &mut Vec<String>,
-    audio: &EditorAudio,
-    console: &mut EditorConsole,
+    _audio: &EditorAudio,
     efs: &mut EditorFileSystem,
-    gts: &mut EditorGeneralTextStylizer,
-    elk: &mut EditorLanguageKeywords
+    dt: f64,
 ) -> bool {
-    if is_key_down(KeyCode::LeftAlt) {
-        // Move line at cursor up by one
-        if is_key_pressed(KeyCode::Up) {
-            if cursor.xy.1 > 0 {
-                text.swap(cursor.xy.1, cursor.xy.1 - 1);
-                cursor.xy.1 -= 1;
-                efs.unsaved_changes = true;
-                audio.play_nav();
-            }
-    
-            return true;
-        }
-    
-        // Move line at cursor down by one
-        if is_key_pressed(KeyCode::Down) {
-            if cursor.xy.1 + 1 < text.len() {
-                text.swap(cursor.xy.1, cursor.xy.1 + 1);
-                cursor.xy.1 += 1;
-                efs.unsaved_changes = true;
-                audio.play_nav();
-            }
-    
-            return true;
-        }
+    if cursor.is_combo_active(KeyCode::Up, Some(KeyCode::LeftShift), dt) && cursor.xy.1 > 0 {
+        let current_line = cursor.xy.1;
+        let swap_with = current_line - 1;
+        text.swap(current_line, swap_with);
+        efs.unsaved_changes = true;
+
+        // Clamp cursor.x to new line length
+        cursor.xy.0 = cursor.xy.0.min(text[swap_with].len());
+
+        return true;
     }
-    
+
+    if cursor.is_combo_active(KeyCode::Down, Some(KeyCode::LeftShift), dt) && cursor.xy.1 + 1 < text.len() {
+        let current_line = cursor.xy.1;
+        let swap_with = current_line + 1;
+        text.swap(current_line, swap_with);
+        efs.unsaved_changes = true;
+
+        // Clamp cursor.x to new line length
+        cursor.xy.0 = cursor.xy.0.min(text[swap_with].len());
+
+        return true;
+    }
+
     false
 }
 
-/// Left control shortcuts
-fn lctrl_shortcuts(
+/// Left control shortcuts (unchanged, using is_combo_active for repeats)
+pub fn lctrl_shortcuts(
     cursor: &mut EditorCursor,
     text: &mut Vec<String>,
     audio: &EditorAudio,
@@ -73,20 +63,21 @@ fn lctrl_shortcuts(
     efs: &mut EditorFileSystem,
     gts: &mut EditorGeneralTextStylizer,
     ops: &mut EditorOptions,
-    elk: &mut EditorLanguageKeywords
+    elk: &mut EditorLanguageKeywords,
+    dt: f64
 ) -> bool {
-    // Left control shorcuts
     if is_key_down(KeyCode::LeftControl) {
-        // Specific to general.
+        if cursor.is_combo_active(KeyCode::X, None, dt) && !text.is_empty() {
+            audio.play_delete();
+            efs.unsaved_changes = true;
+            text.remove(cursor.xy.1);
+            return true;
+        }
 
-        // Delete line
-        if is_key_pressed(KeyCode::X) {
-            if text.len() > 0 {
-                audio.play_delete();
-                efs.unsaved_changes = true;
-                text.remove(cursor.xy.1);
-            }
-
+        if cursor.is_combo_active(KeyCode::D, None, dt) && !text.is_empty() {
+            audio.play_insert();
+            let line_clone = text[cursor.xy.1].clone();
+            text.insert(cursor.xy.1 + 1, line_clone);
             return true;
         }
 
@@ -160,17 +151,6 @@ fn lctrl_shortcuts(
             return true;
         }
 
-        // Duplicate line
-        if is_key_pressed(KeyCode::D) {
-            if text.len() > 0 {
-                audio.play_insert();
-                let line_clone = text[cursor.xy.1].clone();
-                text.insert(cursor.xy.1 + 1, line_clone);
-            }
-    
-            return true;
-        }
-        
         // Delete the word that the cursor is currently at
         if is_key_pressed(KeyCode::W) {
             // Find the character collection of the word, left and right
@@ -239,9 +219,10 @@ fn lctrl_shortcuts(
 
             return true;
         }
-        
-        file_text_special_navigation(cursor, text, audio);
 
+
+        file_text_special_navigation(cursor, text, audio, dt);
+        
         return true;
     }
 
@@ -257,141 +238,104 @@ pub fn record_special_keys(
     gts: &mut EditorGeneralTextStylizer,
     efs: &mut EditorFileSystem,
     ops: &mut EditorOptions,
-    elk: &mut EditorLanguageKeywords
+    elk: &mut EditorLanguageKeywords,
+    dt: f64
 ) -> bool {
     // Backspace
-    if is_key_pressed(KeyCode::Backspace) {
+    if cursor.is_combo_active(KeyCode::Backspace, None,  dt) {
         audio.play_delete();
         efs.unsaved_changes = true;
 
         if text.is_empty() {
             return true;
         }
-    
-        // Clamp cursor_x to line length
+
         let line = &mut text[cursor.xy.1];
-        let line_len = line.chars().count();
-        cursor.xy.0 = (cursor.xy.0).min(line_len);
-    
-        if cursor.xy.0 == 0 {
-            // Merge with previous line if possible
-            if cursor.xy.1 > 0 {
-                let current_line = text.remove(cursor.xy.1);
-                cursor.xy.1 -= 1;
-                cursor.xy.0 = text[cursor.xy.1].chars().count();
-                text[cursor.xy.1].push_str(&current_line);
-            }
+        cursor.xy.0 = cursor.xy.0.min(line.chars().count());
 
-
+        if cursor.xy.0 == 0 && cursor.xy.1 > 0 {
+            let current_line = text.remove(cursor.xy.1);
+            cursor.xy.1 -= 1;
+            cursor.xy.0 = text[cursor.xy.1].chars().count();
+            text[cursor.xy.1].push_str(&current_line);
             return true;
         }
-    
-        let cursor_pos = cursor.xy.0;
-    
-        // Tab deletion
-        if cursor_pos >= TAB_SIZE {
-            let start_char = cursor_pos - TAB_SIZE;
-            let end_char = cursor_pos;
-            let start_byte = char_to_byte(line, start_char);
-            let end_byte = char_to_byte(line, end_char);
-    
-            if &line[start_byte..end_byte] == TAB_PATTERN {
-                line.replace_range(start_byte..end_byte, "");
-                cursor.xy.0 -= TAB_SIZE;
 
+        let cursor_pos = cursor.xy.0;
+
+        if cursor_pos >= TAB_SIZE {
+            let start = char_to_byte(line, cursor_pos - TAB_SIZE);
+            let end = char_to_byte(line, cursor_pos);
+            if &line[start..end] == TAB_PATTERN {
+                line.replace_range(start..end, "");
+                cursor.xy.0 -= TAB_SIZE;
                 return true;
             }
         }
-    
-        // Normal deletion
-        let byte_idx = char_to_byte(line, cursor_pos - 1);
-        if byte_idx < line.len() {
-            line.remove(byte_idx);
-            cursor.xy.0 -= 1;
+
+        if cursor_pos > 0 {
+            let idx = char_to_byte(line, cursor_pos - 1);
+            if idx < line.len() {
+                line.remove(idx);
+                cursor.xy.0 -= 1;
+            }
         }
 
         return true;
     }
 
     // Tab insertion
-    if is_key_pressed(KeyCode::Tab) {
+    if cursor.is_combo_active(KeyCode::Tab, None,  dt) {
         audio.play_space();
-
         let line = &mut text[cursor.xy.1];
-        let byte_idx = char_to_byte(line, cursor.xy.0);
-        line.insert_str(byte_idx, TAB_PATTERN);
-        
+        let idx = char_to_byte(line, cursor.xy.0);
+        line.insert_str(idx, TAB_PATTERN);
         cursor.xy.0 += TAB_SIZE;
-
         return true;
     }
-    
-    if is_key_pressed(KeyCode::Enter) {
+
+    // Enter key (line splitting, indentation)
+    if cursor.is_combo_active(KeyCode::Enter, None,  dt) {
         audio.play_return();
         efs.unsaved_changes = true;
-    
+
         let cursor_pos = cursor.xy.0;
-    
         let mut line = text.remove(cursor.xy.1);
         let split_index = char_to_byte(&line, cursor_pos);
         let mut rest_of_line = line.split_off(split_index);
-    
         let base_indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
         let opener = line.trim_end().chars().last();
-    
         let mut inner_indent = base_indent.clone();
-    
-        // Check if we are between opener and closer
+
         if let Some(opener) = opener {
-            let expected_closer = match opener {
-                '(' => ')',
-                '{' => '}',
-                '[' => ']',
-                _ => '\0',
-            };
-    
-            if expected_closer != '\0' {
-                // If rest_of_line starts with the closer, move it out temporarily
-                if rest_of_line.starts_with(expected_closer) {
-                    rest_of_line = rest_of_line[expected_closer.len_utf8()..].to_string();
-                }
-                
+            let expected_closer = match opener { '(' => ')', '{' => '}', '[' => ']', _ => '\0' };
+            if expected_closer != '\0' && rest_of_line.starts_with(expected_closer) {
+                rest_of_line = rest_of_line[expected_closer.len_utf8()..].to_string();
                 inner_indent.push_str(TAB_PATTERN);
             }
         }
-    
-        // Insert original line
+
         text.insert(cursor.xy.1, line);
-    
-        // Insert new indented line
         cursor.xy.1 += 1;
         cursor.xy.0 = inner_indent.chars().count();
         text.insert(cursor.xy.1, format!("{}{}", inner_indent, rest_of_line));
-    
-        // Insert closer if needed
+
         if let Some(opener) = opener {
-            let closer = match opener {
-                '(' => ')',
-                '{' => '}',
-                '[' => ']',
-                   _ => '\0',
-           };
+            let closer = match opener { '(' => ')', '{' => '}', '[' => ']', _ => '\0' };
             if closer != '\0' {
                 text.insert(cursor.xy.1 + 1, format!("{}{}", base_indent, closer));
             }
         }
     }
-    
-    if lalt_shortcuts(cursor, text, audio, console, efs, gts, elk) {
-        return true;
+
+    lshift_shortcuts(cursor, text, audio, efs, dt);
+
+    let is_lctrl = lctrl_shortcuts(cursor, text, audio, console, efs, gts, ops, elk, dt);
+
+    if !is_lctrl {
+        file_text_navigation(cursor, text, audio, dt);
     }
 
-    if lctrl_shortcuts(cursor, text, audio, console, efs, gts, ops, elk) {
-        return true;
-    }
-
-    file_text_navigation(cursor, text, audio);
-    
     false
 }
 
@@ -404,193 +348,25 @@ pub fn record_keyboard_to_file_text(
     gts: &mut EditorGeneralTextStylizer,
     efs: &mut EditorFileSystem,
     ops: &mut EditorOptions,
-    elk: &mut EditorLanguageKeywords
+    elk: &mut EditorLanguageKeywords,
+    dt: f64
 ) {
-    // let c = get_char_pressed().unwrap(); // Unwrap removes the Result/Option wrapper.
+    if text.is_empty() { text.push(String::new()); }
 
-    if text.is_empty() { // Allocate memory for a new string
-        text.push(String::new());
-    }
-
-    if record_special_keys(cursor, text, audio, console, gts, efs, ops, elk) {
-        return; // Handle the special key and terminate the call, as to 
-        // not record any special escape character
+    if record_special_keys(cursor, text, audio, console, gts, efs, ops, elk, dt) {
+        return;
     }
 
     if let Some(c) = get_char_pressed() {
-        // Skip control characters
-        if c.is_control() || c.is_ascii_control() {
-            return;
-        }
-        
-        if c == ')' {
-            let line = &text[cursor.xy.1];
-            if line.chars().nth(cursor.xy.0) == Some(')') {
-                cursor.xy.0 += 1;
-                
-                return;
-            }
-        }
+        if c.is_control() || c.is_ascii_control() { return; }
 
-        if c == '>' {
-            let line = &text[cursor.xy.1];
-            if line.chars().nth(cursor.xy.0) == Some('>') {
-                cursor.xy.0 += 1;
-                
-                return;
-            }
-        }
-        
-        if c == ']' {
-            let line = &text[cursor.xy.1];
-            if line.chars().nth(cursor.xy.0) == Some(']') {
-                cursor.xy.0 += 1;
-                
-                return;
-            }
-    
-        }
-        
-        if c == '}' {
-            let line = &text[cursor.xy.1];
-            if line.chars().nth(cursor.xy.0) == Some('}') {
-                cursor.xy.0 += 1;
-                
-                return;
-            }
-        }
-    
+        let line = &mut text[cursor.xy.1];
         efs.unsaved_changes = true;
 
-        // We will also handle smart/smarter identation here.
-        while cursor.xy.1 >= text.len() {
-            text.push(String::new());
-        }
-        match c {
-            '<' => {
-                audio.play_insert();
+        let idx = char_to_byte(line, cursor.xy.0);
+        line.insert(idx, c);
+        cursor.xy.0 += 1;
 
-                let line = &mut text[cursor.xy.1];
-
-                let byte_idx = char_to_byte(line, cursor.xy.0);
-                
-                line.insert(byte_idx, c);
-                
-                cursor.xy.0 += 1;
-                
-                let next_byte_idx = char_to_byte(line, cursor.xy.0);
-
-                line.insert(next_byte_idx, '>');
-
-                recognize_cursor_word(cursor, &text[cursor.xy.1]);
-            }
-
-            '(' => {
-                audio.play_insert();
-
-                let line = &mut text[cursor.xy.1];
-
-                let byte_idx = char_to_byte(line, cursor.xy.0);
-                
-                line.insert(byte_idx, c);
-                
-                cursor.xy.0 += 1;
-                
-                let next_byte_idx = char_to_byte(line, cursor.xy.0);
-
-                line.insert(next_byte_idx, ')');
-
-                recognize_cursor_word(cursor, &text[cursor.xy.1]);
-            }
-
-            '{' => {
-                audio.play_insert();
-
-                let line = &mut text[cursor.xy.1];
-
-                let byte_idx = char_to_byte(line, cursor.xy.0);
-                
-                line.insert(byte_idx, c);
-                
-                cursor.xy.0 += 1;
-                
-                let next_byte_idx = char_to_byte(line, cursor.xy.0);
-
-                line.insert(next_byte_idx, '}');
-
-                recognize_cursor_word(cursor, &text[cursor.xy.1]);
-            }
-
-            '\'' => {
-                audio.play_insert();
-
-                let line = &mut text[cursor.xy.1];
-
-                let byte_idx = char_to_byte(line, cursor.xy.0);
-                
-                line.insert(byte_idx, c);
-                
-                cursor.xy.0 += 1;
-                
-                let next_byte_idx = char_to_byte(line, cursor.xy.0);
-
-                line.insert(next_byte_idx, '\'');
-
-                recognize_cursor_word(cursor, &text[cursor.xy.1]);
-            }
-
-            '"' => {
-                audio.play_insert();
-
-                let line = &mut text[cursor.xy.1];
-
-                let byte_idx = char_to_byte(line, cursor.xy.0);
-                
-                line.insert(byte_idx, c);
-                
-                cursor.xy.0 += 1;
-                
-                let next_byte_idx = char_to_byte(line, cursor.xy.0);
-
-                line.insert(next_byte_idx, '"');
-
-                recognize_cursor_word(cursor, &text[cursor.xy.1]);
-            }
-
-            '[' => {
-                audio.play_insert();
-
-                let line = &mut text[cursor.xy.1];
-
-                let byte_idx = char_to_byte(line, cursor.xy.0);
-                
-                line.insert(byte_idx, c);
-                
-                cursor.xy.0 += 1;
-                
-                let next_byte_idx = char_to_byte(line, cursor.xy.0);
-
-                line.insert(next_byte_idx, ']');
-
-                recognize_cursor_word(cursor, &text[cursor.xy.1]);
-            }
-
-            _ => {
-                if c != ' ' { 
-                    audio.play_insert();
-                } else {
-                    audio.play_space();
-                }
-
-                let line = &mut text[cursor.xy.1];
-
-                let byte_idx = char_to_byte(line, cursor.xy.0);
-                
-                line.insert(byte_idx, c); // Normal insertion.
-                cursor.xy.0 += 1;
-
-                recognize_cursor_word(cursor, &text[cursor.xy.1]);
-            }
-        }
+        recognize_cursor_word(cursor, &text[cursor.xy.1]);
     }
 }

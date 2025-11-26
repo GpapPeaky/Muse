@@ -6,9 +6,9 @@ mod text;
 mod camera;
 mod audio;
 mod options;
+mod win;
 
 use std::vec;
-use miniquad::{conf::Icon};
 use macroquad::prelude::*;
 
 use crate::audio::editor_audio::EditorAudio;
@@ -22,6 +22,9 @@ use crate::text::editor_input::record_keyboard_to_file_text;
 use crate::text::editor_language_manager::{EditorLanguageKeywords ,load_keywords_for_extension};
 use crate::text::editor_text::{CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE, MODE_Y_MARGIN, MODE_Y_OFFSET, draw_file_text};
 use crate::text::editor_text_stylizer::EditorGeneralTextStylizer;
+use crate::win::editor_win_config::*;
+
+// FIXME: Window icon issues.
 
 // TODO: Finish all the directives.
 // TODO: Add Ctrl + z to undo last change.
@@ -38,27 +41,9 @@ use crate::text::editor_text_stylizer::EditorGeneralTextStylizer;
 // IDEA: Add file markings finder <:spot>, moves by one in each directive return, won't clear inside the console so the user can keep moving.
 // IDEA: Add file markings finder <:spot N>, moves to the N-th marked spot inside the file. 
 
-pub const VERSION: &str = "Muse-v01.05.00";
+pub const VERSION: &str = "Muse-v01.05.01";
 
-/// Window configuration
-fn window_conf() -> Conf {
-    let icon = Icon {
-        small: *include_bytes!("../assets/icon/muse16.bin"),   // 16x16 RGBA
-        medium: *include_bytes!("../assets/icon/muse32.bin"),  // 32x32 RGBA
-        big: *include_bytes!("../assets/icon/muse64.bin"),     // 64x64 RGBA
-    };
-
-    Conf {
-        window_title: "Muse".to_string(),
-        icon: Some(icon),
-        window_width: 1700,
-        window_height: 1000,
-        window_resizable: true,
-        ..Default::default()
-    }
-}
-
-#[macroquad::main(window_conf)]
+#[macroquad::main(window_conf())]
 async fn main() {
     // Editor options
     let mut ops = EditorOptions::new();    
@@ -107,8 +92,11 @@ async fn main() {
             }
         }
 
+        // Get time since last frame.
+        let dt: f64 = get_frame_time().into();
+
         if !console.mode {
-            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts, &mut efs, &mut ops, &mut elk);
+            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts, &mut efs, &mut ops, &mut elk, dt);
 
             let mut fname = path_buffer_file_to_string(&efs.current_file);
             if efs.unsaved_changes {
@@ -121,7 +109,7 @@ async fn main() {
 
             draw_text(&file_cursor.word, insert_word_w + CURRENT_FILE_TOP_BAR_OFFSET + CURSOR_WORD_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, BLUE);
         } else {
-            console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text, &mut file_cursor, &mut ops, &mut elk);
+            console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text, &mut file_cursor, &mut ops, &mut elk, dt);
             
             let mut fname = path_buffer_file_to_string(&efs.current_file);
             if efs.unsaved_changes {

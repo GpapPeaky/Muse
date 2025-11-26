@@ -61,8 +61,8 @@ use crate::text::editor_cursor::*;
 use crate::VERSION;
 use crate::text::editor_language_manager::EditorLanguageKeywords;
 use crate::text::editor_language_manager::load_keywords_for_extension;
-use crate::text::editor_language_manager::recognize_identifiers;
-use crate::text::editor_language_manager::tokenize_text_file;
+// use crate::text::editor_language_manager::_recognize_identifiers;
+// use crate::text::editor_language_manager::_tokenize_text_file;
 use crate::text::editor_text::find_word_in_text;
 
 /// Check if there is a ':', trim it, match it to a directive and execute it

@@ -96,9 +96,10 @@ impl EditorConsole {
         text: &mut Vec<String>,
         cursor: &mut EditorCursor,
         ops: &mut EditorOptions,
-        elk: &mut EditorLanguageKeywords
+        elk: &mut EditorLanguageKeywords,
+        dt: f64
     ) {
-        if is_key_pressed(KeyCode::Backspace) {
+        if cursor.is_combo_active(KeyCode::Backspace, None, dt) {
             if self.cursor.x > 0 && !self.directive.is_empty() {
                 let mut byte_idx = char_to_byte(&self.directive, self.cursor.x - 1);
             
@@ -149,9 +150,10 @@ impl EditorConsole {
         text: &mut Vec<String>,
         cursor: &mut EditorCursor,
         ops: &mut EditorOptions,
-        elk: &mut EditorLanguageKeywords
+        elk: &mut EditorLanguageKeywords,
+        dt: f64
     ) {
-        self.record_special_console_keys(audio, efs, text, cursor, ops, elk);
+        self.record_special_console_keys(audio, efs, text, cursor, ops, elk, dt);
 
         // Disable special characters from the console.
         if let Some(c) = get_char_pressed() {
