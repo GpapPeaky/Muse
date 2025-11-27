@@ -22,11 +22,10 @@ use crate::text::editor_input::record_keyboard_to_file_text;
 use crate::text::editor_language_manager::{EditorLanguageKeywords ,load_keywords_for_extension};
 use crate::text::editor_text::{CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE, MODE_Y_MARGIN, MODE_Y_OFFSET, draw_file_text};
 use crate::text::editor_text_stylizer::EditorGeneralTextStylizer;
-use crate::win::editor_win_config::*;
+use crate::win::editor_win_config::window_conf;
 
 // FIXME: Window icon issues.
 
-// TODO: Add selection mode.
 // TODO: Finish all the directives.
 // TODO: Add Ctrl + z to undo last change.
 // TODO: Add Ctrl + c to copy selected text.
@@ -34,6 +33,7 @@ use crate::win::editor_win_config::*;
 // TODO: Add the palletes.
 // TODO: Add more fonts.
 
+// IDEA: Add selection mode
 // IDEA: Add a list of user defined functions to make it easier to traverse files.
 // IDEA: Add a list of user defined identifiers that will pop up as an autocomplete thing.
 // IDEA: Add a cmd/terminal wrapper maybe, for compiling/executing code and git commands.
@@ -92,11 +92,8 @@ async fn main() {
             }
         }
 
-        // Get time since last frame.
-        let dt: f64 = get_frame_time().into();
-
         if !console.mode {
-            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts, &mut efs, &mut ops, &mut elk, dt);
+            record_keyboard_to_file_text(&mut file_cursor, &mut file_text, &audio, &mut console,  &mut gts, &mut efs, &mut ops, &mut elk);
 
             let mut fname = path_buffer_file_to_string(&efs.current_file);
             if efs.unsaved_changes {
@@ -109,7 +106,7 @@ async fn main() {
 
             draw_text(&file_cursor.word, insert_word_w + CURRENT_FILE_TOP_BAR_OFFSET + CURSOR_WORD_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0, MODE_FONT_SIZE, BLUE);
         } else {
-            console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text, &mut file_cursor, &mut ops, &mut elk, dt);
+            console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text, &mut file_cursor, &mut ops, &mut elk);
             
             let mut fname = path_buffer_file_to_string(&efs.current_file);
             if efs.unsaved_changes {
@@ -133,9 +130,9 @@ async fn main() {
         }
 
         if is_key_down(KeyCode::LeftAlt) {
-            draw_fps();
+            muse_draw_fps();
         }
         
-        next_frame().await;
+        muse_next_frame().await;
     }
 }

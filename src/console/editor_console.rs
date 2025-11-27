@@ -97,9 +97,8 @@ impl EditorConsole {
         cursor: &mut EditorCursor,
         ops: &mut EditorOptions,
         elk: &mut EditorLanguageKeywords,
-        dt: f64
     ) {
-        if cursor.is_combo_active(KeyCode::Backspace, None, dt) {
+        if cursor.is_combo_active(KeyCode::Backspace, None) {
             if self.cursor.x > 0 && !self.directive.is_empty() {
                 let mut byte_idx = char_to_byte(&self.directive, self.cursor.x - 1);
             
@@ -151,9 +150,8 @@ impl EditorConsole {
         cursor: &mut EditorCursor,
         ops: &mut EditorOptions,
         elk: &mut EditorLanguageKeywords,
-        dt: f64
     ) {
-        self.record_special_console_keys(audio, efs, text, cursor, ops, elk, dt);
+        self.record_special_console_keys(audio, efs, text, cursor, ops, elk);
 
         // Disable special characters from the console.
         if let Some(c) = get_char_pressed() {

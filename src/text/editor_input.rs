@@ -25,9 +25,8 @@ fn lshift_shortcuts(
     text: &mut Vec<String>,
     _audio: &EditorAudio,
     efs: &mut EditorFileSystem,
-    dt: f64,
 ) -> bool {
-    if cursor.is_combo_active(KeyCode::Up, Some(KeyCode::LeftShift), dt) && cursor.xy.1 > 0 {
+    if cursor.is_combo_active(KeyCode::Up, Some(KeyCode::LeftShift)) && cursor.xy.1 > 0 {
         let current_line = cursor.xy.1;
         let swap_with = current_line - 1;
         text.swap(current_line, swap_with);
@@ -39,7 +38,7 @@ fn lshift_shortcuts(
         return true;
     }
 
-    if cursor.is_combo_active(KeyCode::Down, Some(KeyCode::LeftShift), dt) && cursor.xy.1 + 1 < text.len() {
+    if cursor.is_combo_active(KeyCode::Down, Some(KeyCode::LeftShift)) && cursor.xy.1 + 1 < text.len() {
         let current_line = cursor.xy.1;
         let swap_with = current_line + 1;
         text.swap(current_line, swap_with);
@@ -64,17 +63,16 @@ pub fn lctrl_shortcuts(
     gts: &mut EditorGeneralTextStylizer,
     ops: &mut EditorOptions,
     elk: &mut EditorLanguageKeywords,
-    dt: f64
 ) -> bool {
     if is_key_down(KeyCode::LeftControl) {
-        if cursor.is_combo_active(KeyCode::X, None, dt) && !text.is_empty() {
+        if cursor.is_combo_active(KeyCode::X, None) && !text.is_empty() {
             audio.play_delete();
             efs.unsaved_changes = true;
             text.remove(cursor.xy.1);
             return true;
         }
 
-        if cursor.is_combo_active(KeyCode::D, None, dt) && !text.is_empty() {
+        if cursor.is_combo_active(KeyCode::D, None) && !text.is_empty() {
             audio.play_insert();
             let line_clone = text[cursor.xy.1].clone();
             text.insert(cursor.xy.1 + 1, line_clone);
@@ -218,7 +216,7 @@ pub fn lctrl_shortcuts(
         }
 
 
-        file_text_special_navigation(cursor, text, audio, dt);
+        file_text_special_navigation(cursor, text, audio);
         
         return true;
     }
@@ -236,10 +234,9 @@ pub fn record_special_keys(
     efs: &mut EditorFileSystem,
     ops: &mut EditorOptions,
     elk: &mut EditorLanguageKeywords,
-    dt: f64
 ) -> bool {
     // Backspace
-    if cursor.is_combo_active(KeyCode::Backspace, None,  dt) {
+    if cursor.is_combo_active(KeyCode::Backspace, None) {
         audio.play_delete();
         efs.unsaved_changes = true;
 
@@ -282,7 +279,7 @@ pub fn record_special_keys(
     }
 
     // Tab insertion
-    if cursor.is_combo_active(KeyCode::Tab, None,  dt) {
+    if cursor.is_combo_active(KeyCode::Tab, None) {
         audio.play_space();
         let line = &mut text[cursor.xy.1];
         let idx = char_to_byte(line, cursor.xy.0);
@@ -292,7 +289,7 @@ pub fn record_special_keys(
     }
 
     // Enter key (line splitting, indentation)
-    if cursor.is_combo_active(KeyCode::Enter, None,  dt) {
+    if cursor.is_combo_active(KeyCode::Enter, None) {
         audio.play_return();
         efs.unsaved_changes = true;
 
@@ -325,12 +322,12 @@ pub fn record_special_keys(
         }
     }
 
-    lshift_shortcuts(cursor, text, audio, efs, dt);
+    lshift_shortcuts(cursor, text, audio, efs);
 
-    let is_lctrl = lctrl_shortcuts(cursor, text, audio, console, efs, gts, ops, elk, dt);
+    let is_lctrl = lctrl_shortcuts(cursor, text, audio, console, efs, gts, ops, elk);
 
     if !is_lctrl {
-        file_text_navigation(cursor, text, audio, dt);
+        file_text_navigation(cursor, text, audio);
     }
 
     false
@@ -346,11 +343,10 @@ pub fn record_keyboard_to_file_text(
     efs: &mut EditorFileSystem,
     ops: &mut EditorOptions,
     elk: &mut EditorLanguageKeywords,
-    dt: f64
 ) {
     if text.is_empty() { text.push(String::new()); }
 
-    if record_special_keys(cursor, text, audio, console, gts, efs, ops, elk, dt) {
+    if record_special_keys(cursor, text, audio, console, gts, efs, ops, elk) {
         return;
     }
 

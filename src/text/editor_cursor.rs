@@ -4,14 +4,15 @@
 use std::collections::{HashMap};
 
 use macroquad::prelude::*;
+use miniquad::date;
 
 use crate::audio::editor_audio::*;
 
 pub const CURSOR_WORD_OFFSET: f32 = 600.0;
 
-pub const CURSOR_CONTINIOUS_PRESS_INITAL_DELAY: f64 = 0.01;
+pub const CURSOR_CONTINUOUS_PRESS_INITIAL_DELAY: f64 = 0.02;
 
-pub const CURSOR_CONTINIOUS_PRESS_DELAY: f64 = 0.08;
+pub const CURSOR_CONTINUOUS_PRESS_DELAY: f64 = 0.09;
 
 pub struct EditorCursor {
     pub xy: (usize, usize),
@@ -29,17 +30,17 @@ impl EditorCursor {
     }
 
     /// Returns true if key is pressed with continuous repeat
-    pub fn is_combo_active(&mut self, key: KeyCode, modifier: Option<KeyCode>, dt: f64) -> bool {
-        let repeat_delay = CURSOR_CONTINIOUS_PRESS_INITAL_DELAY;
-        let repeat_rate = CURSOR_CONTINIOUS_PRESS_DELAY;
-
+    pub fn is_combo_active(&mut self, key: KeyCode, modifier: Option<KeyCode>) -> bool {
         if is_key_down(key) && modifier.map_or(true, |m| is_key_down(m)) {
-            let timer = self.key_timers.entry((key, modifier)).or_insert(repeat_delay);
-            if *timer <= 0.0 {
-                *timer = repeat_rate;
+            let now = date::now();
+
+            let timer = self.key_timers.entry((key, modifier)).or_insert(now + CURSOR_CONTINUOUS_PRESS_INITIAL_DELAY);
+
+            if now >= *timer {
+                // Set next repeat
+                *timer = now + CURSOR_CONTINUOUS_PRESS_DELAY;
                 return true;
             } else {
-                *timer -= dt;
                 return false;
             }
         } else {
@@ -73,7 +74,6 @@ pub fn file_text_navigation(
     cursor: &mut EditorCursor,
     text: &mut Vec<String>,
     audio: &EditorAudio,
-    dt: f64,
 ) {
     if text.is_empty() {
         cursor.xy = (0, 0);
@@ -84,21 +84,21 @@ pub fn file_text_navigation(
     cursor.xy.0 = cursor.xy.0.min(text[cursor.xy.1].len());
 
     // Up
-    if cursor.is_combo_active(KeyCode::Up, None, dt) && cursor.xy.1 > 0 {
+    if cursor.is_combo_active(KeyCode::Up, None) && cursor.xy.1 > 0 {
         cursor.xy.1 -= 1;
         cursor.xy.0 = cursor.xy.0.min(text[cursor.xy.1].len());
         audio.play_nav();
     }
 
     // Down
-    if cursor.is_combo_active(KeyCode::Down, None, dt) && cursor.xy.1 + 1 < text.len() {
+    if cursor.is_combo_active(KeyCode::Down, None) && cursor.xy.1 + 1 < text.len() {
         cursor.xy.1 += 1;
         cursor.xy.0 = cursor.xy.0.min(text[cursor.xy.1].len());
         audio.play_nav();
     }
 
     // Left
-    if cursor.is_combo_active(KeyCode::Left, None, dt) {
+    if cursor.is_combo_active(KeyCode::Left, None) {
         if cursor.xy.0 > 0 {
             cursor.xy.0 -= 1;
         } else if cursor.xy.1 > 0 {
@@ -109,7 +109,7 @@ pub fn file_text_navigation(
     }
 
     // Right
-    if cursor.is_combo_active(KeyCode::Right, None, dt) {
+    if cursor.is_combo_active(KeyCode::Right, None) {
         if cursor.xy.0 < text[cursor.xy.1].len() {
             cursor.xy.0 += 1;
         } else if cursor.xy.1 + 1 < text.len() {
@@ -127,7 +127,6 @@ pub fn file_text_special_navigation(
     cursor: &mut EditorCursor, 
     text: &mut Vec<String>, 
     audio: &EditorAudio,
-    dt: f64
 ) {
     if text.is_empty() {
         cursor.xy.0 = 0;
@@ -143,7 +142,7 @@ pub fn file_text_special_navigation(
     let left_steps_to_whitespace = calibrate_distance_to_whitespace_or_character(false, cursor.xy.0, &text[cursor.xy.1]);
     let right_steps_to_whitespace = calibrate_distance_to_whitespace_or_character(true, cursor.xy.0, &text[cursor.xy.1]);
 
-    if cursor.is_combo_active(KeyCode::Left, None, dt) {
+    if cursor.is_combo_active(KeyCode::Left, None) {
         if cursor.xy.0 > 0 {
             cursor.xy.0 = cursor.xy.0.saturating_sub(left_steps_to_whitespace);
         } else if cursor.xy.1 > 0 {
@@ -154,7 +153,7 @@ pub fn file_text_special_navigation(
         audio.play_nav();
     }
 
-    if cursor.is_combo_active(KeyCode::Right, None, dt) {
+    if cursor.is_combo_active(KeyCode::Right, None) {
         if cursor.xy.0 < line_len {
             cursor.xy.0 += right_steps_to_whitespace.min(line_len - cursor.xy.0);
         } else if cursor.xy.1 + 1 < text.len() {
@@ -168,7 +167,7 @@ pub fn file_text_special_navigation(
     // Vertical step
     let cursor_vertical_step = 5; 
 
-    if cursor.is_combo_active(KeyCode::Up, None, dt) {
+    if cursor.is_combo_active(KeyCode::Up, None) {
         if cursor.xy.1 > cursor_vertical_step {
             cursor.xy.1 -= cursor_vertical_step;
             cursor.xy.0 = cursor.xy.0.min(text[cursor.xy.1].len());
@@ -179,7 +178,7 @@ pub fn file_text_special_navigation(
         audio.play_nav();
     }
 
-    if cursor.is_combo_active(KeyCode::Down, None, dt) {
+    if cursor.is_combo_active(KeyCode::Down, None) {
         if cursor.xy.1 + cursor_vertical_step < text.len() {
             cursor.xy.1 += cursor_vertical_step;
             cursor.xy.0 = cursor.xy.0.min(text[cursor.xy.1].len());
