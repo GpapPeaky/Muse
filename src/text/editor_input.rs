@@ -369,6 +369,8 @@ pub fn record_keyboard_to_file_text(
                 let idx_next = char_to_byte(line, cursor.xy.0 + 1);
                 line.insert(idx_next, ')');
                 cursor.xy.0 += 1;
+
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
             }
             
             '[' => {
@@ -376,6 +378,8 @@ pub fn record_keyboard_to_file_text(
                 let idx_next = char_to_byte(line, cursor.xy.0 + 1);
                 line.insert(idx_next, ']');
                 cursor.xy.0 += 1;
+
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
             }
             
             '{' => {
@@ -383,6 +387,8 @@ pub fn record_keyboard_to_file_text(
                 let idx_next = char_to_byte(line, cursor.xy.0 + 1);
                 line.insert(idx_next, '}');
                 cursor.xy.0 += 1;
+
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
             }
             
             
@@ -395,6 +401,8 @@ pub fn record_keyboard_to_file_text(
                     line.insert(idx + 1, '"');
                     cursor.xy.0 += 1;
                 }
+
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
             }
             
             ')' => {
@@ -404,6 +412,8 @@ pub fn record_keyboard_to_file_text(
                     line.insert(idx, ')');
                     cursor.xy.0 += 1;
                 }
+
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
             }
         
             ']' => {
@@ -413,6 +423,8 @@ pub fn record_keyboard_to_file_text(
                     line.insert(idx, ']');
                     cursor.xy.0 += 1;
                 }
+
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
             }
         
             '}' => {
@@ -422,16 +434,20 @@ pub fn record_keyboard_to_file_text(
                     line.insert(idx, '}');
                     cursor.xy.0 += 1;
                 }
+
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
             }
 
             _ => {
                 line.insert(idx, c);
                 cursor.xy.0 += 1;
-            }
-        }
 
+                recognize_cursor_word(cursor, &text[cursor.xy.1]);
+            }
+
+        }
+        
         audio.play_insert();
-        recognize_cursor_word(cursor, &text[cursor.xy.1]);
     }
 }
 

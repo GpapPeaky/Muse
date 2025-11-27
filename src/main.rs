@@ -131,6 +131,10 @@ async fn main() {
                 console.message.clear();
             }
         }
+
+        if is_key_down(KeyCode::LeftAlt) {
+            draw_fps();
+        }
         
         next_frame().await;
     }
