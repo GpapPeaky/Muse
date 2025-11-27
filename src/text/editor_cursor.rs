@@ -145,24 +145,24 @@ pub fn file_text_special_navigation(
 
     if cursor.is_combo_active(KeyCode::Left, None, dt) {
         if cursor.xy.0 > 0 {
-            audio.play_nav();
             cursor.xy.0 = cursor.xy.0.saturating_sub(left_steps_to_whitespace);
         } else if cursor.xy.1 > 0 {
-            audio.play_nav();
             cursor.xy.1 -= 1;
             cursor.xy.0 = text[cursor.xy.1].len();
         }
+
+        audio.play_nav();
     }
 
     if cursor.is_combo_active(KeyCode::Right, None, dt) {
         if cursor.xy.0 < line_len {
-            audio.play_nav();
             cursor.xy.0 += right_steps_to_whitespace.min(line_len - cursor.xy.0);
         } else if cursor.xy.1 + 1 < text.len() {
-            audio.play_nav();
             cursor.xy.1 += 1;
             cursor.xy.0 = 0;
         }
+
+        audio.play_nav();
     }
     
     // Vertical step
