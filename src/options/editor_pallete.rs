@@ -23,4 +23,4 @@ pub const STRING_LITERAL_COLOR: Color       = Color::from_hex(0xFFAA00); // vivi
 pub const CURSOR_COLOR: Color               = Color::from_hex(0xFFFFFF); // white
 pub const MACRO_COLOR: Color                = Color::from_hex(0xFF66FF); // neon pink
 pub const COMMENT_COLOR: Color              = Color::from_hex(0x00FF66); // bright lime green
-pub const IDENTIFIER_COLOR: Color           = Color::from_hex(0xFF33CC); // vibrant pink-purple
+pub const IDENTIFIER_COLOR: Color           = Color::from_hex(0xFF33CE); // vibrant pink-purple
