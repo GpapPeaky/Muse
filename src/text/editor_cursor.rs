@@ -9,9 +9,9 @@ use crate::audio::editor_audio::*;
 
 pub const CURSOR_WORD_OFFSET: f32 = 600.0;
 
-pub const CURSOR_CONTINIOUS_PRESS_INITAL_DELAY: f64 = 0.006;
+pub const CURSOR_CONTINIOUS_PRESS_INITAL_DELAY: f64 = 0.01;
 
-pub const CURSOR_CONTINIOUS_PRESS_DELAY: f64 = 0.095;
+pub const CURSOR_CONTINIOUS_PRESS_DELAY: f64 = 0.08;
 
 pub struct EditorCursor {
     pub xy: (usize, usize),

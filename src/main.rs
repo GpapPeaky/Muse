@@ -41,7 +41,7 @@ use crate::win::editor_win_config::*;
 // IDEA: Add file markings finder <:spot>, moves by one in each directive return, won't clear inside the console so the user can keep moving.
 // IDEA: Add file markings finder <:spot N>, moves to the N-th marked spot inside the file. 
 
-pub const VERSION: &str = "Muse-v01.05.01";
+pub const VERSION: &str = "Muse-v01.05.02";
 
 #[macroquad::main(window_conf())]
 async fn main() {
