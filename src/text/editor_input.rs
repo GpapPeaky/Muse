@@ -115,8 +115,9 @@ pub fn lctrl_shortcuts(
 
         // Open terminal
         if is_key_pressed(KeyCode::T) {
-            console.directive = ":t".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
+            console.directive = ":t $ ".to_string();
+            console.cursor.x = console.directive.len();
+            console.mode = true;
 
             return true;
         }

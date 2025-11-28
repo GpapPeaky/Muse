@@ -64,6 +64,7 @@ All console commands are prefixed with a `:`. Commands without `:` are treated a
 | `:b <f>` | Rename the current file to `<f>`. |
 | `:f <f>` | Jump to the line where the first occurrence of text `<f>` exists. |
 | `:c <f>` | Create a new file named `<f>`. |
+| `:t <c>` | Execute command '<c>' via the native cmd/terminal, yes we can build the editor inside the editor. |
 
 ---
 
@@ -140,12 +141,14 @@ All configuration changes are saved in `cal.conf`.
 | **LCtrl + `W`**                | Delete the word at the cursor index.                         |
 | **LCtrl + `Q`**                | Save and Quit (`:W`, then `:q`).                             |
 | **LCtrl + `E`**                | Quit/Exit (`:e`).                                            |
+| **LCtrl + `T`**                | Open virtual terminal input.                                 |
 | **LCtrl + `` ` ``**            | Switch to console mode.                                      |
 | **LCtrl + `-`**                | Decrease editor font size.                                   |
 | **LCtrl + `=`**                | Increase editor font size.                                   |
 | **LCtrl + ArrowKeys**          | Move cursor 5 steps.                                         |
 | **LCtrl + LShift + ArrowKeys** | Hold to continuously move cursor (1 step per tick).          |
 | **LShift + Up/Down**           | Move line at cursor by one.                                  |
+| **LShift + Left/Right**        | Resize the console's width.                                  |
 ---
 
 ## License
