@@ -1,3 +1,5 @@
+// Editor's 'virtual' terminal
+
 use std::process::{Command, Stdio};
 use std::path::PathBuf;
 
