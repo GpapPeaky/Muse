@@ -81,7 +81,7 @@ All console commands are prefixed with a `:`. Commands without `:` are treated a
 
 ### Configuration Directives
 
-All configuration changes are saved in `cal.conf`.
+All configuration changes are saved in `user.pref`.
 
 | Directive | Description |
 |-----------|-------------|
