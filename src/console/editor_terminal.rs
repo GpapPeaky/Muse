@@ -3,7 +3,7 @@
 use std::process::{Command, Stdio};
 use std::path::PathBuf;
 
-/// TEST: Execute terminal commands, with the <:t> $ <command> directive
+/// EXPERIMENTAL: Execute terminal commands, with the <:t> $ <command> directive
 pub fn execute_terminal_command(directive_command: &str, current_dir: &Option<PathBuf>) -> (String, bool) {
     // Extract command after $
     let t_command = directive_command

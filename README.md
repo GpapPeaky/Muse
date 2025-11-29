@@ -64,7 +64,7 @@ All console commands are prefixed with a `:`. Commands without `:` are treated a
 | `:b <f>` | Rename the current file to `<f>`. |
 | `:f <f>` | Jump to the line where the first occurrence of text `<f>` exists. |
 | `:c <f>` | Create a new file named `<f>`. |
-| `:t <c>` | Execute command '<c>' via the native cmd/terminal, yes we can build the editor inside the editor. |
+| `:t $ <c>` | Execute command `<c>` via the native cmd/terminal, yes we can build the editor inside the editor. |
 
 ---
 
