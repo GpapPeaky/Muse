@@ -20,7 +20,7 @@ use crate::text::editor_language_manager::EditorLanguageKeywords;
 pub const CONSOLE_INITIAL_WIDTH: f32 = 250.0;
 pub const CONSOLE_MARGINS: f32 = 15.0;
 
-pub const CONSOLE_RESIZE_STEP: f32 = 10.0;
+pub const CONSOLE_RESIZE_STEP: f32 = 15.0;
 
 pub struct EditorConsole {
     pub mode: bool,
@@ -109,7 +109,7 @@ impl EditorConsole {
         audio: &EditorAudio
     ) -> bool {
         // Left, resize console
-        if self.cursor.is_combo_active(KeyCode::Left, Some(KeyCode::LeftShift)) {
+        if is_key_down(KeyCode::Left) {
             self.resize_console(true);
             audio.play_nav();   
 
@@ -117,7 +117,7 @@ impl EditorConsole {
         }   
 
         // Right, resize console
-        if self.cursor.is_combo_active(KeyCode::Right, Some(KeyCode::LeftShift)) {
+        if is_key_down(KeyCode::Right) {
             self.resize_console(false);
             audio.play_nav();   
 

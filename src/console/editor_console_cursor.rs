@@ -10,23 +10,23 @@ use crate::{audio::editor_audio::*, text::editor_cursor::{CURSOR_CONTINUOUS_PRES
 
 pub struct EditorConsoleCursor {
     pub x: usize,
-    pub key_timers: HashMap<(KeyCode, Option<KeyCode>), f64>,
+    pub _key_timers: HashMap<(KeyCode, Option<KeyCode>), f64>,
 }
 
 impl EditorConsoleCursor {
     pub fn new() -> EditorConsoleCursor {
         EditorConsoleCursor {
             x: 0,
-            key_timers: HashMap::new()
+            _key_timers: HashMap::new()
         }
     }
 
     /// Returns true if key is pressed with continuous repeat
-    pub fn is_combo_active(&mut self, key: KeyCode, modifier: Option<KeyCode>) -> bool {
+    pub fn _is_combo_active(&mut self, key: KeyCode, modifier: Option<KeyCode>) -> bool {
         if is_key_down(key) && modifier.map_or(true, |m| is_key_down(m)) {
             let now = date::now();
 
-            let timer = self.key_timers.entry((key, modifier)).or_insert(now + CURSOR_CONTINUOUS_PRESS_INITIAL_DELAY);
+            let timer = self._key_timers.entry((key, modifier)).or_insert(now + CURSOR_CONTINUOUS_PRESS_INITIAL_DELAY);
 
             if now >= *timer {
                 // Set next repeat
@@ -36,7 +36,7 @@ impl EditorConsoleCursor {
                 return false;
             }
         } else {
-            self.key_timers.remove(&(key, modifier));
+            self._key_timers.remove(&(key, modifier));
             return false;
         }
     }
