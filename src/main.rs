@@ -70,7 +70,7 @@ async fn main() {
 
         draw_file_text(&mut file_text, &mut file_cursor, &mut gts, &console, &mut ec, &elk);
         if console.mode {
-            console.draw();
+            console.draw(&gts);
         
             let is_cd = console.directive.starts_with(":cd ");
             let auto = draw_dir_contents(

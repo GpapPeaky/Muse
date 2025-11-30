@@ -14,6 +14,7 @@ use crate::options::editor_pallete::{
 use crate::console::editor_console_cursor::*;
 use crate::console::editor_file::*;
 use crate::text::editor_cursor::*;
+use crate::text::editor_text_stylizer::*;
 use crate::console::editor_directives::*;
 use crate::text::editor_language_manager::EditorLanguageKeywords;
 
@@ -35,7 +36,8 @@ pub struct EditorConsole {
 impl EditorConsole {
     /// Console constructor
     pub fn new() -> EditorConsole {
-        EditorConsole { mode: false,
+        EditorConsole { 
+            mode: false,
             directive: String::new(),
             cursor: EditorConsoleCursor::new(),
             message: String::new(),
@@ -60,7 +62,8 @@ impl EditorConsole {
 
     /// Console will be drawn to the right of the screen
     pub fn draw(
-        &self
+        &self,
+        gts: &EditorGeneralTextStylizer
     ) {
         // Console background
         draw_rectangle(screen_width() - self.width,
@@ -86,17 +89,28 @@ impl EditorConsole {
             CONSOLE_FRAME_COLOR
         );
 
-        let directive_len: f32 = measure_text(&self.directive, None, 30, 1.0).width;
+        // Console cursor, ass
+        let rendered = &self.directive[0..self.cursor.x];
+        let metrics = measure_text(rendered, None, gts.font_size as u16, 1.0);
+        let cursor_width = 2.0; // same as your draw_line thickness
+        
+        let cursor_x = screen_width() - self.width 
+            + CONSOLE_MARGINS 
+            + metrics.width 
+            + cursor_width / 2.0;
+        
+        draw_line(
+            cursor_x,
+            CONSOLE_MARGINS,
+            cursor_x,
+            CONSOLE_MARGINS + gts.font_size as f32,
+            cursor_width,
+            CONSOLE_CURSOR_COLOR
+        );
 
-        // Console cursor
-        draw_line(screen_width() - self.width + CONSOLE_MARGINS + directive_len
-            ,CONSOLE_MARGINS
-            ,screen_width() - self.width + CONSOLE_MARGINS + directive_len,
-            CONSOLE_MARGINS + 15.0,
-            2.0,
-            CONSOLE_CURSOR_COLOR);
-
-        draw_text(&self.directive,
+        // Draw the directive written
+        draw_text(
+            &self.directive,
             screen_width() - self.width + CONSOLE_MARGINS - 5.0,
             CONSOLE_MARGINS + 15.0,
             30.0,
