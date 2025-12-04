@@ -20,7 +20,7 @@ use crate::text::editor_language_manager::EditorLanguageKeywords;
 pub const CONSOLE_INITIAL_WIDTH: f32 = 250.0;
 pub const CONSOLE_MARGINS: f32 = 15.0;
 
-pub const CONSOLE_RESIZE_STEP: f32 = 15.0;
+pub const CONSOLE_RESIZE_STEP: f32 = 30.0;
 
 pub struct EditorConsole {
     pub mode: bool,
@@ -30,6 +30,8 @@ pub struct EditorConsole {
     pub showing_message: bool,
     pub showing_manual: bool,
     pub width: f32,
+    pub target_w: f32,
+    pub vel_w: f32,
 }
 
 impl EditorConsole {
@@ -42,20 +44,35 @@ impl EditorConsole {
             message: String::new(),
             showing_message: false,
             showing_manual: false,
-            width: CONSOLE_INITIAL_WIDTH
+            width: CONSOLE_INITIAL_WIDTH,
+            target_w: CONSOLE_INITIAL_WIDTH,
+            vel_w: 1.0,
         }
     }
 
-    /// Resize console
+    /// Animate width through interpolating
+    pub fn animate_width(&mut self,) {
+        let stiffness = 0.35;
+        let damping = 0.3;
+    
+        let dx = self.target_w - self.width;
+    
+        self.vel_w += dx * stiffness;
+        self.vel_w *= damping;
+    
+        self.width += self.vel_w;
+    }
+
+    /// Resize console and interpolate
     pub fn resize_console(
         &mut self,
         leftorright: bool
     ) {
         // Left
         if leftorright {
-            self.width += CONSOLE_RESIZE_STEP;
+            self.target_w += CONSOLE_RESIZE_STEP;
         } else { // Right
-            self.width -= CONSOLE_RESIZE_STEP;
+            self.target_w -= CONSOLE_RESIZE_STEP;
         }
     }
 
@@ -208,7 +225,7 @@ impl EditorConsole {
 
         // Disable special characters from the console.
         if let Some(c) = get_char_pressed() {
-            if !c.is_ascii_alphanumeric() && c != '_' && c != '-' && c != ' ' && c != '.' && c != '/' && c != '\\' && c != ':' && c != '<' && c != '>' && c != '$' {
+            if c.is_control() {
                 return;
             }
 

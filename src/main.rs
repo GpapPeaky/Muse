@@ -141,6 +141,9 @@ async fn main() {
             console.message.clear();
         }
 
+        // Update resize animation
+        console.animate_width();
+
         muse_next_frame().await;
     }
 }
