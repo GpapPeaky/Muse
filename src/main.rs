@@ -14,7 +14,7 @@ use macroquad::prelude::*;
 use crate::audio::editor_audio::EditorAudio;
 use crate::camera::editor_camera::EditorCamera;
 use crate::console::editor_console::{EditorConsole, console_message};
-use crate::console::editor_file::{EditorFileSystem, draw_dir_contents, path_buffer_file_to_string, path_buffer_to_string};
+use crate::console::editor_file_system::{EditorFileSystem, draw_dir_contents, path_buffer_file_to_string, path_buffer_to_string};
 use crate::options::editor_options::EditorOptions;
 use crate::options::editor_pallete::{BACKGROUND_COLOR, COMPOSITE_TYPE_COLOR, CONSOLE_TEXT_COLOR, FILE_COLOR, FOLDER_COLOR, PUNCTUATION_COLOR};
 use crate::text::editor_cursor::{CURSOR_WORD_OFFSET, EditorCursor};
@@ -68,6 +68,7 @@ async fn main() {
     let mut elk: EditorLanguageKeywords = load_keywords_for_extension("txt"); 
 
     let insert_word_w = measure_text("INSERT MODE", Some(&console_gts.font), MODE_FONT_SIZE as u16, 1.0).width;
+    let select_word_w = measure_text("SELECTION MODE", Some(&console_gts.font), MODE_FONT_SIZE as u16, 1.0).width;
     let console_word_w = measure_text("CONSOLE MODE", Some(&console_gts.font), MODE_FONT_SIZE as u16, 1.0).width;
 
     loop {
@@ -84,13 +85,26 @@ async fn main() {
             }
 
             console_gts.color = COMPOSITE_TYPE_COLOR;
-            console_gts.draw("INSERT MODE", MODE_Y_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0);
-            console_gts.color = FOLDER_COLOR;
-            console_gts.draw(&path_buffer_to_string(&efs.current_dir), insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0);
-            console_gts.color = FILE_COLOR;
-            console_gts.draw(&fname, insert_word_w + CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0);
-            console_gts.color = BLUE;
-            console_gts.draw(&file_cursor.word, insert_word_w + CURRENT_FILE_TOP_BAR_OFFSET + CURSOR_WORD_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0);
+            
+            if file_cursor.select_mode {
+                console_gts.draw("SELECTION MODE", MODE_Y_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0);
+                console_gts.color = FOLDER_COLOR;
+                console_gts.draw(&path_buffer_to_string(&efs.current_dir), select_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0);
+                console_gts.color = FILE_COLOR;
+                console_gts.draw(&fname, select_word_w + CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0);
+                console_gts.color = BLUE;
+                console_gts.draw(&file_cursor.word, select_word_w + CURRENT_FILE_TOP_BAR_OFFSET + CURSOR_WORD_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0);
+            } else {
+                console_gts.draw("INSERT MODE", MODE_Y_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0);
+                console_gts.color = FOLDER_COLOR;
+                console_gts.draw(&path_buffer_to_string(&efs.current_dir), insert_word_w + 25.0, MODE_FONT_SIZE + MODE_Y_MARGIN - 15.0);
+                console_gts.color = FILE_COLOR;
+                console_gts.draw(&fname, insert_word_w + CURRENT_FILE_TOP_BAR_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0);
+                console_gts.color = BLUE;
+                console_gts.draw(&file_cursor.word, insert_word_w + CURRENT_FILE_TOP_BAR_OFFSET + CURSOR_WORD_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + 15.0);
+            }
+            
+                
         } else {
             console.record_keyboard_to_console_text(&audio, &mut efs, &mut file_text, &mut file_cursor, &mut ops, &mut elk);
             

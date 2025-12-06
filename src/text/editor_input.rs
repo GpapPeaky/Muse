@@ -6,10 +6,11 @@ use crate::options::editor_options::EditorOptions;
 use crate::text::editor_language_manager::EditorLanguageKeywords;
 use crate::text::editor_text_stylizer::*;
 use crate::text::editor_cursor::*;
+use crate::text::editor_clipboard::*;
 
 use crate::audio::editor_audio::*;
 use crate::console::editor_console::*;
-use crate::console::editor_file::*;
+use crate::console::editor_file_system::*;
 use crate::console::editor_directives::*;
 
 pub const TAB_SIZE: usize = 4;
@@ -139,8 +140,9 @@ pub fn lctrl_shortcuts(
         
         // Remove current file
         if is_key_pressed(KeyCode::R) {
-            console.directive = ":r".to_string();
-            execute_directive(&mut console.directive, efs, text, cursor, ops, elk);
+            console.directive = ":r ".to_string();
+            console.cursor.x = console.directive.len();
+            console.mode = true;
 
             return true;
         }
@@ -205,7 +207,6 @@ pub fn lctrl_shortcuts(
         if is_key_pressed(KeyCode::Minus) {
             if gts.font_size > 12 {
                 gts.font_size -= 2;
-
             }
 
             return true;
@@ -214,9 +215,42 @@ pub fn lctrl_shortcuts(
         if is_key_pressed(KeyCode::Equal) {
             if gts.font_size < 45 {
                 gts.font_size += 2;
-
             }
 
+            return true;
+        }
+        
+        if is_key_pressed(KeyCode::C) {
+            let extract = if cursor.select_mode {
+                // extract from select_xy -> cursor_xy if cursor_xy > select_xy
+                // else form cursor_xy -> select_xy
+                "SELECTED_TEXT" // replace with your extraction logic
+            } else {
+                &text[cursor.xy.1].clone()
+            };
+        
+            cb_set(&extract);
+
+            println!("Setted {}", extract);
+        }
+        
+        if is_key_down(KeyCode::V) {
+            if let Some(paste_text) = cb_get() {
+                println!("Pasted {}", paste_text);
+            }
+        }
+
+        // Select mode switch
+        if is_key_pressed(KeyCode::P) {
+            cursor.select_mode = !cursor.select_mode;
+            
+            // On entry save the initial xy
+            if cursor.select_mode {
+                cursor.select_xy = cursor.xy;
+            } else { // On exit we reset
+                cursor.select_xy = (0, 0);
+            }
+            
             return true;
         }
 

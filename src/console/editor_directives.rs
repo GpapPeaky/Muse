@@ -57,7 +57,7 @@ use macroquad::prelude::rand;
 use crate::VERSION;
 use crate::console::editor_console::console_manual;
 use crate::options::editor_options::*;
-use crate::console::editor_file::*;
+use crate::console::editor_file_system::*;
 use crate::text::editor_cursor::*;
 use crate::text::editor_language_manager::EditorLanguageKeywords;
 use crate::text::editor_language_manager::load_keywords_for_extension;

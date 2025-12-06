@@ -1,4 +1,4 @@
-pub mod editor_file;
+pub mod editor_file_system;
 pub mod editor_directives;
 pub mod editor_terminal;
 pub mod editor_console;

@@ -234,6 +234,9 @@ pub fn draw_file_text(
     if !console.mode {
         let cursor_idx = format!("Ln {}, Col {}", cursor.xy.1, cursor.xy.0);
         gts.color = CONSOLE_TEXT_COLOR;
+        let previous_size = gts.font_size;
+        gts.font_size = 30; // Remains the same.
         gts.draw(&cursor_idx, MODE_Y_OFFSET, MODE_FONT_SIZE + MODE_Y_MARGIN + MODE_Y_OFFSET);
+        gts.font_size = previous_size;
     }
 }

@@ -26,6 +26,8 @@ pub struct EditorCursor {
     pub anim_y: f32,
     pub vel_x: f32,
     pub vel_y: f32,
+    pub select_mode: bool,
+    pub select_xy: (usize, usize)
 }
 
 impl EditorCursor {
@@ -38,6 +40,8 @@ impl EditorCursor {
             anim_y: 0.0,
             vel_x: 0.0,
             vel_y: 0.0,
+            select_mode: false,
+            select_xy: (0, 0)
         }
     }
 
@@ -52,7 +56,7 @@ impl EditorCursor {
             x,
             y + CURSOR_HEIGHT,
             screen_width(),
-            font_size,
+             font_size,
             CURSOR_LINE_COLOR
         );
     }
